@@ -121,7 +121,7 @@ async function main() {
 
   // Launch Puppeteer with GPU acceleration flags
   console.log('Launching headless browser with GPU acceleration...');
-  const browser = await puppeteer.launch({
+  const launchOptions = {
     headless: 'new',
     args: [
       '--no-sandbox',
@@ -134,7 +134,24 @@ async function main() {
       '--hide-scrollbars',
       '--mute-audio',
     ],
-  });
+  };
+
+  // Auto-detect system Chrome on Linux (Google Colab, Debian/Ubuntu)
+  const chromeBinaries = [
+    '/usr/bin/google-chrome',
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/chromium-browser',
+    '/usr/bin/chromium',
+  ];
+  for (const bin of chromeBinaries) {
+    if (fs.existsSync(bin)) {
+      launchOptions.executablePath = bin;
+      console.log(`Using detected Chrome binary at: ${bin}`);
+      break;
+    }
+  }
+
+  const browser = await puppeteer.launch(launchOptions);
 
   const page = await browser.newPage();
   await page.setViewport({ width, height, deviceScaleFactor: 1 });
