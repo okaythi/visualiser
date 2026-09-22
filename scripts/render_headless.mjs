@@ -76,6 +76,8 @@ async function main() {
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
       '--enable-gpu',
+      '--ignore-gpu-blocklist',
+      '--enable-webgl',
       '--use-gl=angle',
       '--use-angle=gl',
       '--enable-gpu-rasterization',
