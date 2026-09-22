@@ -67,11 +67,61 @@ async function main() {
   const out1440 = path.join(opts.outDir, 'Abracadabra_Stage_1440p60.mp4');
   const out1080 = path.join(opts.outDir, 'Abracadabra_Stage_1080p60.mp4');
 
-  // Build FFmpeg argument list
+  // Launch Puppeteer with GPU acceleration flags FIRST (before spawning FFmpeg)
+  console.log('Launching headless browser with GPU acceleration...');
+  const launchOptions = {
+    headless: 'new',
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--enable-gpu',
+      '--use-gl=angle',
+      '--use-angle=gl',
+      '--enable-gpu-rasterization',
+      `--window-size=${width},${height}`,
+      '--hide-scrollbars',
+      '--mute-audio',
+    ],
+  };
+
+  // Auto-detect system Chrome on Linux (Google Colab, Debian/Ubuntu)
+  const chromeBinaries = [
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium-browser',
+    '/usr/bin/chromium',
+  ];
+  for (const bin of chromeBinaries) {
+    if (fs.existsSync(bin)) {
+      launchOptions.executablePath = bin;
+      console.log(`Using detected system Chrome binary: ${bin}`);
+      break;
+    }
+  }
+
+  const browser = await puppeteer.launch(launchOptions);
+
+  const page = await browser.newPage();
+  await page.setViewport({ width, height, deviceScaleFactor: 1 });
+
+  const url = `http://localhost:${opts.port}/?render=1`;
+  console.log(`Connecting to visualiser at ${url}...`);
+  await page.goto(url, { waitUntil: 'networkidle0', timeout: 90000 });
+
+  console.log('Waiting for stage assets, 3D meshes, and telemetry readiness...');
+  await page.waitForFunction(
+    () => typeof window.__IS_READY_FOR_CAPTURE__ === 'function' && window.__IS_READY_FOR_CAPTURE__() === true,
+    { timeout: 90000 }
+  );
+  console.log('Stage ready! Starting deterministic frame-by-frame rendering...');
+
+  // Build FFmpeg argument list with explicit input dimensions and per-output stream options
   let ffmpegArgs = [
     '-y',
     '-f', 'image2pipe',
     '-vcodec', 'png',
+    '-s', `${width}x${height}`,
     '-r', `${opts.fps}`,
     '-i', '-',
     '-i', opts.audio,
@@ -82,16 +132,16 @@ async function main() {
     ffmpegArgs.push(
       '-filter_complex', '[0:v]split=2[v1440][v1080_in];[v1080_in]scale=1920:1080:flags=lanczos[v1080]',
       '-map', '[v1440]', '-map', '1:a',
-      '-c:v:0', vcodec,
-      ...(hasNvenc ? ['-preset', 'p7', '-b:v:0', '35M'] : ['-preset', 'slow', '-crf', '17']),
-      '-pix_fmt:v:0', 'yuv420p',
-      '-c:a:0', 'aac', '-b:a:0', '320k',
+      '-c:v', vcodec,
+      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '35M'] : ['-preset', 'slow', '-crf', '17']),
+      '-pix_fmt', 'yuv420p',
+      '-c:a', 'aac', '-b:a', '320k',
       out1440,
       '-map', '[v1080]', '-map', '1:a',
-      '-c:v:1', vcodec,
-      ...(hasNvenc ? ['-preset', 'p7', '-b:v:1', '22M'] : ['-preset', 'slow', '-crf', '18']),
-      '-pix_fmt:v:1', 'yuv420p',
-      '-c:a:1', 'aac', '-b:a:1', '320k',
+      '-c:v', vcodec,
+      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '22M'] : ['-preset', 'slow', '-crf', '18']),
+      '-pix_fmt', 'yuv420p',
+      '-c:a', 'aac', '-b:a', '320k',
       out1080
     );
   } else if (opts.format === '1440p') {
@@ -118,54 +168,6 @@ async function main() {
     console.error('FFmpeg process error:', err);
     process.exit(1);
   });
-
-  // Launch Puppeteer with GPU acceleration flags
-  console.log('Launching headless browser with GPU acceleration...');
-  const launchOptions = {
-    headless: 'new',
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--enable-gpu',
-      '--use-gl=angle',
-      '--use-angle=gl',
-      '--enable-gpu-rasterization',
-      `--window-size=${width},${height}`,
-      '--hide-scrollbars',
-      '--mute-audio',
-    ],
-  };
-
-  // Auto-detect system Chrome on Linux (Google Colab, Debian/Ubuntu)
-  const chromeBinaries = [
-    '/usr/bin/google-chrome',
-    '/usr/bin/google-chrome-stable',
-    '/usr/bin/chromium-browser',
-    '/usr/bin/chromium',
-  ];
-  for (const bin of chromeBinaries) {
-    if (fs.existsSync(bin)) {
-      launchOptions.executablePath = bin;
-      console.log(`Using detected Chrome binary at: ${bin}`);
-      break;
-    }
-  }
-
-  const browser = await puppeteer.launch(launchOptions);
-
-  const page = await browser.newPage();
-  await page.setViewport({ width, height, deviceScaleFactor: 1 });
-
-  const url = `http://localhost:${opts.port}/?render=1`;
-  console.log(`Connecting to visualiser at ${url}...`);
-  await page.goto(url, { waitUntil: 'networkidle0', timeout: 90000 });
-
-  console.log('Waiting for stage assets, 3D meshes, and telemetry readiness...');
-  await page.waitForFunction(
-    () => typeof window.__IS_READY_FOR_CAPTURE__ === 'function' && window.__IS_READY_FOR_CAPTURE__() === true,
-    { timeout: 90000 }
-  );
-  console.log('Stage ready! Starting deterministic frame-by-frame rendering...');
 
   const startTime = Date.now();
 
