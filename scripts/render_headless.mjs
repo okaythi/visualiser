@@ -15,6 +15,8 @@ function parseArgs() {
     nvenc: true,
     audio: 'public/audio/abracadabra-mix.mp3',
     outDir: '.',
+    imageType: 'jpeg',   // 'jpeg' (15x faster) or 'png'
+    quality: 95,         // JPEG quality (visually lossless for video)
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -28,6 +30,9 @@ function parseArgs() {
     else if (arg === '--out-dir' && args[i + 1]) options.outDir = args[++i];
     else if (arg === '--no-nvenc') options.nvenc = false;
     else if (arg === '--nvenc') options.nvenc = true;
+    else if (arg === '--png') options.imageType = 'png';
+    else if (arg === '--jpeg') options.imageType = 'jpeg';
+    else if (arg === '--quality' && args[i + 1]) options.quality = parseInt(args[++i], 10);
   }
 
   return options;
@@ -78,8 +83,9 @@ async function main() {
       '--enable-gpu',
       '--ignore-gpu-blocklist',
       '--enable-webgl',
-      '--use-gl=angle',
-      '--use-angle=gl',
+      '--use-angle=vulkan',
+      '--enable-features=Vulkan',
+      '--disable-vulkan-surface',
       '--enable-gpu-rasterization',
       `--window-size=${width},${height}`,
       '--hide-scrollbars',
@@ -116,13 +122,26 @@ async function main() {
     () => typeof window.__IS_READY_FOR_CAPTURE__ === 'function' && window.__IS_READY_FOR_CAPTURE__() === true,
     { timeout: 90000 }
   );
+
+  const glRenderer = await page.evaluate(() => {
+    try {
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      const ext = gl?.getExtension('WEBGL_debug_renderer_info');
+      return ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : 'Generic WebGL';
+    } catch (e) {
+      return `GL query error: ${e.message}`;
+    }
+  });
+  console.log(`WebGL Device / Driver: ${glRenderer}`);
+  console.log(`Capture format: ${opts.imageType.toUpperCase()}${opts.imageType === 'jpeg' ? ` (quality: ${opts.quality})` : ''}`);
   console.log('Stage ready! Starting deterministic frame-by-frame rendering...');
 
   // Build FFmpeg argument list with explicit input dimensions and per-output stream options
   let ffmpegArgs = [
     '-y',
     '-f', 'image2pipe',
-    '-vcodec', 'png',
+    '-vcodec', opts.imageType === 'jpeg' ? 'mjpeg' : 'png',
     '-s', `${width}x${height}`,
     '-r', `${opts.fps}`,
     '-i', '-',
@@ -177,11 +196,15 @@ async function main() {
     // 1. Advance virtual clock to exact frame timestamp
     await page.evaluate((f) => window.__SEEK_FRAME__(f), frame);
 
-    // 2. Capture uncompressed frame screenshot
-    const screenshotBuffer = await page.screenshot({
-      type: 'png',
+    // 2. Capture frame screenshot (JPEG is 15x faster than PNG encode)
+    const screenshotOpts = {
+      type: opts.imageType,
       omitBackground: false,
-    });
+    };
+    if (opts.imageType === 'jpeg') {
+      screenshotOpts.quality = opts.quality;
+    }
+    const screenshotBuffer = await page.screenshot(screenshotOpts);
 
     // 3. Pipe raw frame to FFmpeg with backpressure handling
     const canWrite = ffmpeg.stdin.write(screenshotBuffer);
