@@ -224,19 +224,23 @@ async function main() {
 
   // Build FFmpeg argument list with explicit input dimensions and per-output stream options
   let ffmpegArgs = [
+    '-hide_banner',
+    '-loglevel', 'warning',
     '-y',
+    '-thread_queue_size', '512',
     '-f', 'image2pipe',
     '-vcodec', opts.imageType === 'jpeg' ? 'mjpeg' : 'png',
     '-s', `${width}x${height}`,
     '-r', `${opts.fps}`,
     '-i', '-',
+    '-thread_queue_size', '512',
     '-i', opts.audio,
   ];
 
   if (opts.format === 'both') {
     console.log(`Outputs will be generated simultaneously:\n  -> ${out1440}\n  -> ${out1080}`);
     ffmpegArgs.push(
-      '-filter_complex', '[0:v]split=2[v1440][v1080_in];[v1080_in]scale=1920:1080:flags=lanczos[v1080]',
+      '-filter_complex', '[0:v]split=2[v1440][v1080_in];[v1080_in]scale=1920:1080:flags=bicubic[v1080]',
       '-map', '[v1440]', '-map', '1:a',
       '-c:v', vcodec,
       ...(hasNvenc ? ['-preset', 'p7', '-b:v', '35M'] : ['-preset', 'slow', '-crf', '17']),
@@ -276,6 +280,7 @@ async function main() {
   });
 
   const startTime = Date.now();
+  let renderStartTime = startTime;
 
   for (let frame = opts.start; frame < opts.frames; frame++) {
     // 1. Advance virtual clock to exact frame timestamp
@@ -297,23 +302,31 @@ async function main() {
       await new Promise((resolve) => ffmpeg.stdin.once('drain', resolve));
     }
 
-    // 4. Progress reporting
-    if (frame % opts.fps === 0 || frame === opts.frames - 1) {
+    // Warmup frame handling: calibrate active timer after first frame
+    if (frame === opts.start) {
+      renderStartTime = Date.now();
+      console.log(`[Frame ${frame.toString().padStart(5)}/${opts.frames}] GPU pipeline & shaders calibrated. Starting render stream...`);
+      continue;
+    }
+
+    // 4. Progress reporting (every 10 frames for live real-time feedback)
+    const logInterval = 10;
+    if (frame % logInterval === 0 || frame === opts.frames - 1) {
       const now = Date.now();
-      const elapsedTotalSec = (now - startTime) / 1000;
-      const framesDone = frame - opts.start + 1;
-      const currentFps = framesDone / elapsedTotalSec;
+      const elapsedActiveSec = (now - renderStartTime) / 1000;
+      const framesRendered = frame - opts.start;
+      const currentFps = framesRendered / (elapsedActiveSec || 0.001);
       const remainingFrames = opts.frames - frame - 1;
       const etaSec = remainingFrames / (currentFps || 1);
-      const percent = ((framesDone / (opts.frames - opts.start)) * 100).toFixed(1);
+      const percent = ((framesRendered / (opts.frames - opts.start)) * 100).toFixed(1);
       const songSec = (frame / opts.fps).toFixed(2);
 
       const etaM = Math.floor(etaSec / 60);
       const etaS = Math.floor(etaSec % 60).toString().padStart(2, '0');
 
       console.log(
-        `[Frame ${frame.toString().padStart(5)}/${opts.frames}] ${percent}% | ` +
-        `Song: ${songSec}s | Speed: ${currentFps.toFixed(1)} fps | ETA: ${etaM}m ${etaS}s`
+        `[Frame ${frame.toString().padStart(5)}/${opts.frames}] ${percent.padStart(5)}% | ` +
+        `Song: ${songSec.padStart(6)}s | Speed: ${currentFps.toFixed(1)} fps | ETA: ${etaM}m ${etaS}s`
       );
     }
   }
