@@ -494,7 +494,7 @@ function StageModel(props: NeonStageProps) {
         <planeGeometry args={[35, 45]} />
         <MeshReflectorMaterial
           ref={reflectorRef}
-          blur={[400, 100]}
+          blur={[120, 40]}
           resolution={1024}
           mixBlur={0.85}
           mixStrength={3.2}
@@ -523,8 +523,8 @@ function StageModel(props: NeonStageProps) {
         intensity={0.85}
         color="#c084fc"
         castShadow
-        shadow-mapSize-width={4096}
-        shadow-mapSize-height={4096}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
         shadow-bias={-0.0001}
       />
 
@@ -548,8 +548,8 @@ function StageModel(props: NeonStageProps) {
         distance={35}
         decay={2}
         castShadow
-        shadow-mapSize-width={4096}
-        shadow-mapSize-height={4096}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
         shadow-radius={3.5}
         shadow-bias={-0.0001}
       />
