@@ -161,22 +161,27 @@ async function main() {
   console.log('Launching headless browser with GPU acceleration...');
   const launchOptions = {
     headless: 'new',
-    ignoreDefaultArgs: ['--disable-gpu', '--disable-software-rasterizer'],
+    ignoreDefaultArgs: true, // Prevents Puppeteer from injecting --use-angle=swiftshader-webgl
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
+      '--headless=new',
       '--enable-gpu',
-      '--ignore-gpu-blocklist',
-      '--enable-webgl',
       '--use-angle=vulkan',
       '--enable-features=Vulkan',
       '--disable-vulkan-surface',
       '--enable-unsafe-webgpu',
+      '--ignore-gpu-blocklist',
+      '--enable-webgl',
       '--enable-gpu-rasterization',
+      '--disable-dev-shm-usage',
+      '--disable-features=Translate',
+      '--no-first-run',
+      '--no-default-browser-check',
       `--window-size=${width},${height}`,
       '--hide-scrollbars',
       '--mute-audio',
+      '--enable-automation',
     ],
   };
 
@@ -220,7 +225,11 @@ async function main() {
       return `GL query error: ${e.message}`;
     }
   });
-  console.log(`WebGL Device / Driver: ${glRenderer}`);
+  const isHardwareGpu = !glRenderer.toLowerCase().includes('swiftshader') && !glRenderer.toLowerCase().includes('llvmpipe');
+  console.log('================================================================');
+  console.log(`  RENDER ACCELERATOR:  ${glRenderer}`);
+  console.log(`  HARDWARE GPU ACTIVE: ${isHardwareGpu ? 'YES (Nvidia Hardware Acceleration)' : 'NO (CPU SwiftShader Fallback - run Cell 3 to install libnvidia-gl)'}`);
+  console.log('================================================================');
   console.log(`Capture format: ${opts.imageType.toUpperCase()}${opts.imageType === 'jpeg' ? ` (quality: ${opts.quality})` : ''}`);
   console.log('Stage ready! Starting deterministic frame-by-frame rendering...');
 
