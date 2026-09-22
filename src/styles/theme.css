@@ -1,0 +1,349 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Ubuntu+Mono:ital,wght@0,400;0,700&display=swap');
+
+/* ==========================================================================
+   NIXLABS DESIGN SYSTEM - CSS CUSTOM PROPERTIES & TOKENS
+   ========================================================================== */
+
+:root {
+  /* Typography */
+  --mono: 'Ubuntu Mono', ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+  --sans: 'Ubuntu', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Light Theme (Warm Paper / Cream Aesthetic) */
+  --bg: #f7f4eb;
+  --bg-subtle: #efeae0;
+  --bg-card: #f2ece0;
+  --text: #21201c;
+  --text-muted: #646059;
+  --border: #dfd8c8;
+  --border-focus: #0284c7;
+  --link-underline: #0284c7;
+  --code-bg: #ece6d8;
+  --danger: #dc2626;
+  --success: #16a34a;
+}
+
+[data-theme='dark'] {
+  /* Dark Theme (Nixlabs Pitch / Carbon Aesthetic) */
+  --bg: #101010;
+  --bg-subtle: #181818;
+  --bg-card: #151515;
+  --text: #e5e5e5;
+  --text-muted: #888888;
+  --border: #262626;
+  --border-focus: #38bdf8;
+  --link-underline: #38bdf8;
+  --code-bg: #1c1c1c;
+  --danger: #ef4444;
+  --success: #22c55e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #101010;
+    --bg-subtle: #181818;
+    --bg-card: #151515;
+    --text: #e5e5e5;
+    --text-muted: #888888;
+    --border: #262626;
+    --border-focus: #38bdf8;
+    --link-underline: #38bdf8;
+    --code-bg: #1c1c1c;
+    --danger: #ef4444;
+    --success: #22c55e;
+  }
+}
+
+/* ==========================================================================
+   RESET & GLOBAL RULES
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-muted);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.55;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   APP CONTAINERS & LAYOUT
+   ========================================================================== */
+
+.app-container {
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.brand-badge .subdomain {
+  color: var(--link-underline);
+}
+
+.brand-badge .tld {
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   CARDS & PANELS
+   ========================================================================== */
+
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.card-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.card-desc {
+  margin: 0 0 1.25rem 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+/* ==========================================================================
+   BUTTONS & CONTROLS
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  border: 1px solid var(--border);
+  background-color: var(--bg-card);
+  color: var(--text);
+  user-select: none;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--text-muted);
+  background-color: var(--bg-subtle);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+  background-color: var(--text);
+  color: var(--bg);
+}
+
+.btn-icon {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 4px;
+  padding: 0.35rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+}
+
+.btn-icon:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+  background: var(--bg-card);
+}
+
+/* ==========================================================================
+   INPUTS & FORMS
+   ========================================================================== */
+
+.input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  background-color: var(--bg-subtle);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+/* ==========================================================================
+   FLOATING CONTROLS (MATCHING NIXLABS.TECH)
+   ========================================================================== */
+
+.floating-controls {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 100;
+}
+
+.floating-btn {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.15s ease, transform 0.1s ease;
+}
+
+.floating-btn:hover {
+  border-color: var(--text-muted);
+  transform: translateY(-1px);
+}
+
+.stroke-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Sun/Moon visibility based on active theme */
+[data-theme='dark'] .sun-icon {
+  display: block;
+}
+[data-theme='dark'] .moon-icon {
+  display: none;
+}
+
+[data-theme='light'] .sun-icon {
+  display: none;
+}
+[data-theme='light'] .moon-icon {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .sun-icon {
+    display: block;
+  }
+  :root:not([data-theme='light']) .moon-icon {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   MONOSPACE DATA & STEM VISUALIZER FOUNDATIONS
+   ========================================================================== */
+
+.mono {
+  font-family: var(--mono);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
