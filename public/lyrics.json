@@ -1,0 +1,1768 @@
+{
+  "song": "Lady Gaga - Abracadabra",
+  "source": "karaoke.nixlabs.tech (R2 _lyrics_live/lady-gaga-abracadabra-official-audio.json)",
+  "offsetApplied": 1.45,
+  "lyricsData": [
+    {
+      "verseStart": 1.56,
+      "verseEnd": 4.899,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 1.56,
+          "end": 2.699
+        },
+        {
+          "word": "abracadabra",
+          "start": 2.699,
+          "end": 4.499
+        }
+      ]
+    },
+    {
+      "verseStart": 5.369,
+      "verseEnd": 8.729,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 5.369,
+          "end": 6.529
+        },
+        {
+          "word": "abracadabra",
+          "start": 6.529,
+          "end": 8.329
+        }
+      ]
+    },
+    {
+      "verseStart": 16.762,
+      "verseEnd": 20.206,
+      "words": [
+        {
+          "word": "Pay",
+          "start": 16.762,
+          "end": 17.203
+        },
+        {
+          "word": "the",
+          "start": 17.203,
+          "end": 17.325
+        },
+        {
+          "word": "toll",
+          "start": 17.325,
+          "end": 18.659
+        },
+        {
+          "word": "to",
+          "start": 18.659,
+          "end": 18.785
+        },
+        {
+          "word": "the",
+          "start": 18.785,
+          "end": 19.07
+        },
+        {
+          "word": "angels",
+          "start": 19.07,
+          "end": 19.993
+        }
+      ]
+    },
+    {
+      "verseStart": 20.206,
+      "verseEnd": 24.386,
+      "words": [
+        {
+          "word": "Drawin'",
+          "start": 20.206,
+          "end": 20.547
+        },
+        {
+          "word": "circles",
+          "start": 20.547,
+          "end": 22.172
+        },
+        {
+          "word": "in",
+          "start": 22.172,
+          "end": 22.28
+        },
+        {
+          "word": "the",
+          "start": 22.28,
+          "end": 22.726
+        },
+        {
+          "word": "clouds",
+          "start": 22.726,
+          "end": 23.986
+        }
+      ]
+    },
+    {
+      "verseStart": 24.605,
+      "verseEnd": 27.705,
+      "words": [
+        {
+          "word": "Keep",
+          "start": 24.605,
+          "end": 24.838
+        },
+        {
+          "word": "your",
+          "start": 24.838,
+          "end": 25.086
+        },
+        {
+          "word": "mind",
+          "start": 25.086,
+          "end": 26.265
+        },
+        {
+          "word": "on",
+          "start": 26.265,
+          "end": 26.384
+        },
+        {
+          "word": "the",
+          "start": 26.384,
+          "end": 26.505
+        },
+        {
+          "word": "distance",
+          "start": 26.505,
+          "end": 27.305
+        }
+      ]
+    },
+    {
+      "verseStart": 27.961,
+      "verseEnd": 31.178,
+      "words": [
+        {
+          "word": "When",
+          "start": 27.961,
+          "end": 28.19
+        },
+        {
+          "word": "the",
+          "start": 28.19,
+          "end": 28.309
+        },
+        {
+          "word": "devil",
+          "start": 28.309,
+          "end": 29.684
+        },
+        {
+          "word": "turns",
+          "start": 29.684,
+          "end": 29.839
+        },
+        {
+          "word": "around",
+          "start": 29.839,
+          "end": 30.778
+        }
+      ]
+    },
+    {
+      "verseStart": 32.221,
+      "verseEnd": 35.314,
+      "words": [
+        {
+          "word": "Hold",
+          "start": 32.221,
+          "end": 32.686
+        },
+        {
+          "word": "me",
+          "start": 32.686,
+          "end": 33.172
+        },
+        {
+          "word": "in",
+          "start": 33.172,
+          "end": 33.708
+        },
+        {
+          "word": "your",
+          "start": 33.708,
+          "end": 33.906
+        },
+        {
+          "word": "heart",
+          "start": 33.906,
+          "end": 34.338
+        },
+        {
+          "word": "tonight",
+          "start": 34.338,
+          "end": 35.185
+        }
+      ]
+    },
+    {
+      "verseStart": 35.314,
+      "verseEnd": 39.365,
+      "words": [
+        {
+          "word": "In",
+          "start": 35.314,
+          "end": 35.545
+        },
+        {
+          "word": "the",
+          "start": 35.545,
+          "end": 35.757
+        },
+        {
+          "word": "magic",
+          "start": 35.757,
+          "end": 36.613
+        },
+        {
+          "word": "of",
+          "start": 36.613,
+          "end": 37.431
+        },
+        {
+          "word": "the",
+          "start": 37.431,
+          "end": 37.631
+        },
+        {
+          "word": "dark",
+          "start": 37.631,
+          "end": 38.052
+        },
+        {
+          "word": "moonlight",
+          "start": 38.052,
+          "end": 38.965
+        }
+      ]
+    },
+    {
+      "verseStart": 39.77,
+      "verseEnd": 43.568,
+      "words": [
+        {
+          "word": "Save",
+          "start": 39.77,
+          "end": 40.228
+        },
+        {
+          "word": "me",
+          "start": 40.228,
+          "end": 40.699
+        },
+        {
+          "word": "from",
+          "start": 40.699,
+          "end": 41.17
+        },
+        {
+          "word": "this",
+          "start": 41.17,
+          "end": 41.342
+        },
+        {
+          "word": "empty",
+          "start": 41.342,
+          "end": 42.197
+        },
+        {
+          "word": "fight",
+          "start": 42.197,
+          "end": 43.168
+        }
+      ]
+    },
+    {
+      "verseStart": 45.041,
+      "verseEnd": 47.254,
+      "words": [
+        {
+          "word": "In",
+          "start": 45.041,
+          "end": 45.232
+        },
+        {
+          "word": "the",
+          "start": 45.232,
+          "end": 45.449
+        },
+        {
+          "word": "game",
+          "start": 45.449,
+          "end": 45.743
+        },
+        {
+          "word": "of",
+          "start": 45.743,
+          "end": 46.155
+        },
+        {
+          "word": "life",
+          "start": 46.155,
+          "end": 46.854
+        }
+      ]
+    },
+    {
+      "verseStart": 46.854,
+      "verseEnd": 50.931,
+      "words": [
+        {
+          "word": "Like",
+          "start": 46.854,
+          "end": 47.078
+        },
+        {
+          "word": "a",
+          "start": 47.078,
+          "end": 47.265
+        },
+        {
+          "word": "poem",
+          "start": 47.265,
+          "end": 47.986
+        },
+        {
+          "word": "said",
+          "start": 47.986,
+          "end": 48.662
+        },
+        {
+          "word": "by",
+          "start": 48.662,
+          "end": 48.94
+        },
+        {
+          "word": "a",
+          "start": 48.94,
+          "end": 49.187
+        },
+        {
+          "word": "lady",
+          "start": 49.187,
+          "end": 49.786
+        },
+        {
+          "word": "in",
+          "start": 49.786,
+          "end": 49.993
+        },
+        {
+          "word": "red",
+          "start": 49.993,
+          "end": 50.531
+        }
+      ]
+    },
+    {
+      "verseStart": 50.531,
+      "verseEnd": 54.068,
+      "words": [
+        {
+          "word": "You",
+          "start": 50.531,
+          "end": 50.751
+        },
+        {
+          "word": "hear",
+          "start": 50.751,
+          "end": 50.992
+        },
+        {
+          "word": "the",
+          "start": 50.992,
+          "end": 51.221
+        },
+        {
+          "word": "last",
+          "start": 51.221,
+          "end": 51.681
+        },
+        {
+          "word": "few",
+          "start": 51.681,
+          "end": 52.165
+        },
+        {
+          "word": "words",
+          "start": 52.165,
+          "end": 52.406
+        },
+        {
+          "word": "of",
+          "start": 52.406,
+          "end": 52.642
+        },
+        {
+          "word": "your",
+          "start": 52.642,
+          "end": 52.868
+        },
+        {
+          "word": "life",
+          "start": 52.868,
+          "end": 53.668
+        }
+      ]
+    },
+    {
+      "verseStart": 54.495,
+      "verseEnd": 58.499,
+      "words": [
+        {
+          "word": "With",
+          "start": 54.495,
+          "end": 54.747
+        },
+        {
+          "word": "a",
+          "start": 54.747,
+          "end": 54.963
+        },
+        {
+          "word": "hauntin'",
+          "start": 54.963,
+          "end": 55.603
+        },
+        {
+          "word": "dance,",
+          "start": 55.603,
+          "end": 56.418
+        },
+        {
+          "word": "now",
+          "start": 56.418,
+          "end": 56.655
+        },
+        {
+          "word": "you're",
+          "start": 56.655,
+          "end": 56.937
+        },
+        {
+          "word": "both",
+          "start": 56.937,
+          "end": 57.173
+        },
+        {
+          "word": "in",
+          "start": 57.173,
+          "end": 57.421
+        },
+        {
+          "word": "a",
+          "start": 57.421,
+          "end": 57.641
+        },
+        {
+          "word": "trance",
+          "start": 57.641,
+          "end": 58.099
+        }
+      ]
+    },
+    {
+      "verseStart": 58.099,
+      "verseEnd": 61.679,
+      "words": [
+        {
+          "word": "It's",
+          "start": 58.099,
+          "end": 58.344
+        },
+        {
+          "word": "time",
+          "start": 58.344,
+          "end": 58.583
+        },
+        {
+          "word": "to",
+          "start": 58.583,
+          "end": 58.805
+        },
+        {
+          "word": "cast",
+          "start": 58.805,
+          "end": 59.239
+        },
+        {
+          "word": "your",
+          "start": 59.239,
+          "end": 59.698
+        },
+        {
+          "word": "spell",
+          "start": 59.698,
+          "end": 59.965
+        },
+        {
+          "word": "on",
+          "start": 59.965,
+          "end": 60.221
+        },
+        {
+          "word": "the",
+          "start": 60.221,
+          "end": 60.479
+        },
+        {
+          "word": "night",
+          "start": 60.479,
+          "end": 61.279
+        }
+      ]
+    },
+    {
+      "verseStart": 62.438,
+      "verseEnd": 66.429,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 62.438,
+          "end": 63.899
+        },
+        {
+          "word": "amor,",
+          "start": 63.899,
+          "end": 64.505
+        },
+        {
+          "word": "ooh",
+          "start": 64.505,
+          "end": 64.713
+        },
+        {
+          "word": "na",
+          "start": 64.713,
+          "end": 65.286
+        },
+        {
+          "word": "na",
+          "start": 65.286,
+          "end": 66.029
+        }
+      ]
+    },
+    {
+      "verseStart": 66.029,
+      "verseEnd": 70.725,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 66.029,
+          "end": 67.887
+        },
+        {
+          "word": "morta,",
+          "start": 67.887,
+          "end": 68.43
+        },
+        {
+          "word": "ooh",
+          "start": 68.43,
+          "end": 68.625
+        },
+        {
+          "word": "ga",
+          "start": 68.625,
+          "end": 69.066
+        },
+        {
+          "word": "ga",
+          "start": 69.066,
+          "end": 70.325
+        }
+      ]
+    },
+    {
+      "verseStart": 70.325,
+      "verseEnd": 74.09,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 70.325,
+          "end": 71.674
+        },
+        {
+          "word": "abra,",
+          "start": 71.674,
+          "end": 72.214
+        },
+        {
+          "word": "ooh",
+          "start": 72.214,
+          "end": 72.413
+        },
+        {
+          "word": "na",
+          "start": 72.413,
+          "end": 72.954
+        },
+        {
+          "word": "na",
+          "start": 72.954,
+          "end": 73.69
+        }
+      ]
+    },
+    {
+      "verseStart": 73.69,
+      "verseEnd": 76.067,
+      "words": [
+        {
+          "word": "In",
+          "start": 73.69,
+          "end": 73.901
+        },
+        {
+          "word": "her",
+          "start": 73.901,
+          "end": 74.125
+        },
+        {
+          "word": "tongue,",
+          "start": 74.125,
+          "end": 74.647
+        },
+        {
+          "word": "she",
+          "start": 74.647,
+          "end": 74.867
+        },
+        {
+          "word": "said",
+          "start": 74.867,
+          "end": 75.667
+        }
+      ]
+    },
+    {
+      "verseStart": 76.074,
+      "verseEnd": 78.759,
+      "words": [
+        {
+          "word": "Death",
+          "start": 76.074,
+          "end": 76.548
+        },
+        {
+          "word": "or",
+          "start": 76.548,
+          "end": 77.006
+        },
+        {
+          "word": "love",
+          "start": 77.006,
+          "end": 77.445
+        },
+        {
+          "word": "tonight",
+          "start": 77.445,
+          "end": 78.359
+        }
+      ]
+    },
+    {
+      "verseStart": 79.724,
+      "verseEnd": 83.027,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 79.724,
+          "end": 80.827
+        },
+        {
+          "word": "abracadabra",
+          "start": 80.827,
+          "end": 82.627
+        }
+      ]
+    },
+    {
+      "verseStart": 83.532,
+      "verseEnd": 86.833,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 83.532,
+          "end": 84.633
+        },
+        {
+          "word": "abracadabra",
+          "start": 84.633,
+          "end": 86.433
+        }
+      ]
+    },
+    {
+      "verseStart": 87.461,
+      "verseEnd": 91.221,
+      "words": [
+        {
+          "word": "Feel",
+          "start": 87.461,
+          "end": 87.809
+        },
+        {
+          "word": "the",
+          "start": 87.809,
+          "end": 87.926
+        },
+        {
+          "word": "beat",
+          "start": 87.926,
+          "end": 88.194
+        },
+        {
+          "word": "under",
+          "start": 88.194,
+          "end": 88.453
+        },
+        {
+          "word": "your",
+          "start": 88.453,
+          "end": 88.653
+        },
+        {
+          "word": "feet,",
+          "start": 88.653,
+          "end": 88.877
+        },
+        {
+          "word": "the",
+          "start": 88.877,
+          "end": 89.412
+        },
+        {
+          "word": "floor's",
+          "start": 89.412,
+          "end": 89.887
+        },
+        {
+          "word": "on",
+          "start": 89.887,
+          "end": 90.363
+        },
+        {
+          "word": "fire",
+          "start": 90.363,
+          "end": 91.163
+        }
+      ]
+    },
+    {
+      "verseStart": 91.221,
+      "verseEnd": 94.428,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 91.221,
+          "end": 92.228
+        },
+        {
+          "word": "abracadabra",
+          "start": 92.228,
+          "end": 94.028
+        }
+      ]
+    },
+    {
+      "verseStart": 95.076,
+      "verseEnd": 98.481,
+      "words": [
+        {
+          "word": "Choose",
+          "start": 95.076,
+          "end": 95.301
+        },
+        {
+          "word": "the",
+          "start": 95.301,
+          "end": 95.418
+        },
+        {
+          "word": "road",
+          "start": 95.418,
+          "end": 96.82
+        },
+        {
+          "word": "on",
+          "start": 96.82,
+          "end": 96.934
+        },
+        {
+          "word": "the",
+          "start": 96.934,
+          "end": 97.035
+        },
+        {
+          "word": "west",
+          "start": 97.035,
+          "end": 97.298
+        },
+        {
+          "word": "side",
+          "start": 97.298,
+          "end": 98.098
+        }
+      ]
+    },
+    {
+      "verseStart": 98.481,
+      "verseEnd": 102.008,
+      "words": [
+        {
+          "word": "As",
+          "start": 98.481,
+          "end": 98.696
+        },
+        {
+          "word": "the",
+          "start": 98.696,
+          "end": 98.82
+        },
+        {
+          "word": "dust",
+          "start": 98.82,
+          "end": 99.074
+        },
+        {
+          "word": "flies,",
+          "start": 99.074,
+          "end": 100.315
+        },
+        {
+          "word": "watch",
+          "start": 100.315,
+          "end": 100.415
+        },
+        {
+          "word": "it",
+          "start": 100.415,
+          "end": 100.808
+        },
+        {
+          "word": "burn",
+          "start": 100.808,
+          "end": 101.608
+        }
+      ]
+    },
+    {
+      "verseStart": 102.718,
+      "verseEnd": 105.688,
+      "words": [
+        {
+          "word": "Don't",
+          "start": 102.718,
+          "end": 102.949
+        },
+        {
+          "word": "waste",
+          "start": 102.949,
+          "end": 103.218
+        },
+        {
+          "word": "time",
+          "start": 103.218,
+          "end": 104.163
+        },
+        {
+          "word": "on",
+          "start": 104.163,
+          "end": 104.378
+        },
+        {
+          "word": "a",
+          "start": 104.378,
+          "end": 104.488
+        },
+        {
+          "word": "feelin'",
+          "start": 104.488,
+          "end": 105.288
+        }
+      ]
+    },
+    {
+      "verseStart": 106.028,
+      "verseEnd": 109.63,
+      "words": [
+        {
+          "word": "Use",
+          "start": 106.028,
+          "end": 106.273
+        },
+        {
+          "word": "your",
+          "start": 106.273,
+          "end": 106.394
+        },
+        {
+          "word": "passion,",
+          "start": 106.394,
+          "end": 107.881
+        },
+        {
+          "word": "no",
+          "start": 107.881,
+          "end": 108.163
+        },
+        {
+          "word": "return",
+          "start": 108.163,
+          "end": 109.23
+        }
+      ]
+    },
+    {
+      "verseStart": 110.37,
+      "verseEnd": 113.435,
+      "words": [
+        {
+          "word": "Hold",
+          "start": 110.37,
+          "end": 110.839
+        },
+        {
+          "word": "me",
+          "start": 110.839,
+          "end": 111.303
+        },
+        {
+          "word": "in",
+          "start": 111.303,
+          "end": 111.799
+        },
+        {
+          "word": "your",
+          "start": 111.799,
+          "end": 112.009
+        },
+        {
+          "word": "heart",
+          "start": 112.009,
+          "end": 112.466
+        },
+        {
+          "word": "tonight",
+          "start": 112.466,
+          "end": 113.304
+        }
+      ]
+    },
+    {
+      "verseStart": 113.435,
+      "verseEnd": 117.546,
+      "words": [
+        {
+          "word": "In",
+          "start": 113.435,
+          "end": 113.647
+        },
+        {
+          "word": "the",
+          "start": 113.647,
+          "end": 113.924
+        },
+        {
+          "word": "magic",
+          "start": 113.924,
+          "end": 114.783
+        },
+        {
+          "word": "of",
+          "start": 114.783,
+          "end": 115.549
+        },
+        {
+          "word": "the",
+          "start": 115.549,
+          "end": 115.772
+        },
+        {
+          "word": "dark",
+          "start": 115.772,
+          "end": 116.218
+        },
+        {
+          "word": "moonlight",
+          "start": 116.218,
+          "end": 117.146
+        }
+      ]
+    },
+    {
+      "verseStart": 117.967,
+      "verseEnd": 121.863,
+      "words": [
+        {
+          "word": "Save",
+          "start": 117.967,
+          "end": 118.437
+        },
+        {
+          "word": "me",
+          "start": 118.437,
+          "end": 118.905
+        },
+        {
+          "word": "from",
+          "start": 118.905,
+          "end": 119.424
+        },
+        {
+          "word": "this",
+          "start": 119.424,
+          "end": 119.652
+        },
+        {
+          "word": "empty",
+          "start": 119.652,
+          "end": 120.464
+        },
+        {
+          "word": "fight",
+          "start": 120.464,
+          "end": 121.463
+        }
+      ]
+    },
+    {
+      "verseStart": 123.203,
+      "verseEnd": 125.459,
+      "words": [
+        {
+          "word": "In",
+          "start": 123.203,
+          "end": 123.421
+        },
+        {
+          "word": "the",
+          "start": 123.421,
+          "end": 123.687
+        },
+        {
+          "word": "game",
+          "start": 123.687,
+          "end": 123.902
+        },
+        {
+          "word": "of",
+          "start": 123.902,
+          "end": 124.334
+        },
+        {
+          "word": "life",
+          "start": 124.334,
+          "end": 125.059
+        }
+      ]
+    },
+    {
+      "verseStart": 125.059,
+      "verseEnd": 129.062,
+      "words": [
+        {
+          "word": "Like",
+          "start": 125.059,
+          "end": 125.294
+        },
+        {
+          "word": "a",
+          "start": 125.294,
+          "end": 125.532
+        },
+        {
+          "word": "poem",
+          "start": 125.532,
+          "end": 126.173
+        },
+        {
+          "word": "said",
+          "start": 126.173,
+          "end": 126.934
+        },
+        {
+          "word": "by",
+          "start": 126.934,
+          "end": 127.182
+        },
+        {
+          "word": "a",
+          "start": 127.182,
+          "end": 127.436
+        },
+        {
+          "word": "lady",
+          "start": 127.436,
+          "end": 127.936
+        },
+        {
+          "word": "in",
+          "start": 127.936,
+          "end": 128.159
+        },
+        {
+          "word": "red",
+          "start": 128.159,
+          "end": 128.662
+        }
+      ]
+    },
+    {
+      "verseStart": 128.662,
+      "verseEnd": 132.208,
+      "words": [
+        {
+          "word": "You",
+          "start": 128.662,
+          "end": 128.882
+        },
+        {
+          "word": "hear",
+          "start": 128.882,
+          "end": 129.119
+        },
+        {
+          "word": "the",
+          "start": 129.119,
+          "end": 129.359
+        },
+        {
+          "word": "last",
+          "start": 129.359,
+          "end": 129.812
+        },
+        {
+          "word": "few",
+          "start": 129.812,
+          "end": 130.297
+        },
+        {
+          "word": "words",
+          "start": 130.297,
+          "end": 130.574
+        },
+        {
+          "word": "of",
+          "start": 130.574,
+          "end": 130.783
+        },
+        {
+          "word": "your",
+          "start": 130.783,
+          "end": 131.008
+        },
+        {
+          "word": "life",
+          "start": 131.008,
+          "end": 131.808
+        }
+      ]
+    },
+    {
+      "verseStart": 132.615,
+      "verseEnd": 136.65,
+      "words": [
+        {
+          "word": "With",
+          "start": 132.615,
+          "end": 132.852
+        },
+        {
+          "word": "a",
+          "start": 132.852,
+          "end": 133.068
+        },
+        {
+          "word": "hauntin'",
+          "start": 133.068,
+          "end": 133.789
+        },
+        {
+          "word": "dance,",
+          "start": 133.789,
+          "end": 134.571
+        },
+        {
+          "word": "now",
+          "start": 134.571,
+          "end": 134.787
+        },
+        {
+          "word": "you're",
+          "start": 134.787,
+          "end": 135.079
+        },
+        {
+          "word": "both",
+          "start": 135.079,
+          "end": 135.31
+        },
+        {
+          "word": "in",
+          "start": 135.31,
+          "end": 135.545
+        },
+        {
+          "word": "a",
+          "start": 135.545,
+          "end": 135.8
+        },
+        {
+          "word": "trance",
+          "start": 135.8,
+          "end": 136.25
+        }
+      ]
+    },
+    {
+      "verseStart": 136.25,
+      "verseEnd": 139.888,
+      "words": [
+        {
+          "word": "It's",
+          "start": 136.25,
+          "end": 136.497
+        },
+        {
+          "word": "time",
+          "start": 136.497,
+          "end": 136.718
+        },
+        {
+          "word": "to",
+          "start": 136.718,
+          "end": 136.953
+        },
+        {
+          "word": "cast",
+          "start": 136.953,
+          "end": 137.4
+        },
+        {
+          "word": "your",
+          "start": 137.4,
+          "end": 137.959
+        },
+        {
+          "word": "spell",
+          "start": 137.959,
+          "end": 138.194
+        },
+        {
+          "word": "on",
+          "start": 138.194,
+          "end": 138.443
+        },
+        {
+          "word": "the",
+          "start": 138.443,
+          "end": 138.688
+        },
+        {
+          "word": "night",
+          "start": 138.688,
+          "end": 139.488
+        }
+      ]
+    },
+    {
+      "verseStart": 140.714,
+      "verseEnd": 144.419,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 140.714,
+          "end": 142.12
+        },
+        {
+          "word": "amor,",
+          "start": 142.12,
+          "end": 142.83
+        },
+        {
+          "word": "ooh",
+          "start": 142.83,
+          "end": 143.099
+        },
+        {
+          "word": "na",
+          "start": 143.099,
+          "end": 143.403
+        },
+        {
+          "word": "na",
+          "start": 143.403,
+          "end": 144.019
+        }
+      ]
+    },
+    {
+      "verseStart": 144.019,
+      "verseEnd": 148.745,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 144.019,
+          "end": 145.927
+        },
+        {
+          "word": "morta,",
+          "start": 145.927,
+          "end": 146.431
+        },
+        {
+          "word": "ooh",
+          "start": 146.431,
+          "end": 146.624
+        },
+        {
+          "word": "ga",
+          "start": 146.624,
+          "end": 147.059
+        },
+        {
+          "word": "ga",
+          "start": 147.059,
+          "end": 148.345
+        }
+      ]
+    },
+    {
+      "verseStart": 148.345,
+      "verseEnd": 152.138,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 148.345,
+          "end": 149.669
+        },
+        {
+          "word": "abra,",
+          "start": 149.669,
+          "end": 150.209
+        },
+        {
+          "word": "ooh",
+          "start": 150.209,
+          "end": 150.376
+        },
+        {
+          "word": "na",
+          "start": 150.376,
+          "end": 150.851
+        },
+        {
+          "word": "na",
+          "start": 150.851,
+          "end": 151.738
+        }
+      ]
+    },
+    {
+      "verseStart": 151.738,
+      "verseEnd": 154.063,
+      "words": [
+        {
+          "word": "In",
+          "start": 151.738,
+          "end": 151.94
+        },
+        {
+          "word": "her",
+          "start": 151.94,
+          "end": 152.169
+        },
+        {
+          "word": "tongue,",
+          "start": 152.169,
+          "end": 152.651
+        },
+        {
+          "word": "she",
+          "start": 152.651,
+          "end": 152.863
+        },
+        {
+          "word": "said",
+          "start": 152.863,
+          "end": 153.663
+        }
+      ]
+    },
+    {
+      "verseStart": 154.069,
+      "verseEnd": 156.731,
+      "words": [
+        {
+          "word": "Death",
+          "start": 154.069,
+          "end": 154.562
+        },
+        {
+          "word": "or",
+          "start": 154.562,
+          "end": 155.004
+        },
+        {
+          "word": "love",
+          "start": 155.004,
+          "end": 155.426
+        },
+        {
+          "word": "tonight",
+          "start": 155.426,
+          "end": 156.331
+        }
+      ]
+    },
+    {
+      "verseStart": 157.846,
+      "verseEnd": 161.134,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 157.846,
+          "end": 158.934
+        },
+        {
+          "word": "abracadabra",
+          "start": 158.934,
+          "end": 160.734
+        }
+      ]
+    },
+    {
+      "verseStart": 161.652,
+      "verseEnd": 164.976,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 161.652,
+          "end": 162.776
+        },
+        {
+          "word": "abracadabra",
+          "start": 162.776,
+          "end": 164.576
+        }
+      ]
+    },
+    {
+      "verseStart": 165.576,
+      "verseEnd": 169.389,
+      "words": [
+        {
+          "word": "Feel",
+          "start": 165.576,
+          "end": 165.91
+        },
+        {
+          "word": "the",
+          "start": 165.91,
+          "end": 166.038
+        },
+        {
+          "word": "beat",
+          "start": 166.038,
+          "end": 166.274
+        },
+        {
+          "word": "under",
+          "start": 166.274,
+          "end": 166.509
+        },
+        {
+          "word": "your",
+          "start": 166.509,
+          "end": 166.761
+        },
+        {
+          "word": "feet,",
+          "start": 166.761,
+          "end": 167.228
+        },
+        {
+          "word": "the",
+          "start": 167.228,
+          "end": 167.463
+        },
+        {
+          "word": "floor's",
+          "start": 167.463,
+          "end": 167.893
+        },
+        {
+          "word": "on",
+          "start": 167.893,
+          "end": 168.419
+        },
+        {
+          "word": "fire",
+          "start": 168.419,
+          "end": 169.219
+        }
+      ]
+    },
+    {
+      "verseStart": 169.389,
+      "verseEnd": 172.199,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 169.389,
+          "end": 170.391
+        },
+        {
+          "word": "abracadabra",
+          "start": 170.391,
+          "end": 172.191
+        }
+      ]
+    },
+    {
+      "verseStart": 172.199,
+      "verseEnd": 178.527,
+      "words": [
+        {
+          "word": "Phantom",
+          "start": 172.199,
+          "end": 172.674
+        },
+        {
+          "word": "of",
+          "start": 172.674,
+          "end": 172.92
+        },
+        {
+          "word": "the",
+          "start": 172.92,
+          "end": 173.139
+        },
+        {
+          "word": "dance",
+          "start": 173.139,
+          "end": 174.367
+        },
+        {
+          "word": "floor,",
+          "start": 174.367,
+          "end": 174.604
+        },
+        {
+          "word": "come",
+          "start": 174.604,
+          "end": 175.11
+        },
+        {
+          "word": "to",
+          "start": 175.11,
+          "end": 176.81
+        },
+        {
+          "word": "me",
+          "start": 176.81,
+          "end": 178.127
+        }
+      ]
+    },
+    {
+      "verseStart": 179.834,
+      "verseEnd": 184.07,
+      "words": [
+        {
+          "word": "Sing",
+          "start": 179.834,
+          "end": 180.06
+        },
+        {
+          "word": "for",
+          "start": 180.06,
+          "end": 180.292
+        },
+        {
+          "word": "me",
+          "start": 180.292,
+          "end": 180.529
+        },
+        {
+          "word": "a",
+          "start": 180.529,
+          "end": 180.778
+        },
+        {
+          "word": "sinful",
+          "start": 180.778,
+          "end": 182.574
+        },
+        {
+          "word": "melody",
+          "start": 182.574,
+          "end": 183.67
+        }
+      ]
+    },
+    {
+      "verseStart": 203.427,
+      "verseEnd": 207.302,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 203.427,
+          "end": 204.887
+        },
+        {
+          "word": "amor,",
+          "start": 204.887,
+          "end": 205.404
+        },
+        {
+          "word": "ooh",
+          "start": 205.404,
+          "end": 205.603
+        },
+        {
+          "word": "na",
+          "start": 205.603,
+          "end": 206.056
+        },
+        {
+          "word": "na",
+          "start": 206.056,
+          "end": 206.902
+        }
+      ]
+    },
+    {
+      "verseStart": 206.902,
+      "verseEnd": 211.521,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 206.902,
+          "end": 209.146
+        },
+        {
+          "word": "morta,",
+          "start": 209.146,
+          "end": 209.418
+        },
+        {
+          "word": "ooh",
+          "start": 209.418,
+          "end": 209.623
+        },
+        {
+          "word": "ga",
+          "start": 209.623,
+          "end": 210.028
+        },
+        {
+          "word": "ga",
+          "start": 210.028,
+          "end": 211.121
+        }
+      ]
+    },
+    {
+      "verseStart": 211.121,
+      "verseEnd": 214.935,
+      "words": [
+        {
+          "word": "Abracadabra,",
+          "start": 211.121,
+          "end": 212.382
+        },
+        {
+          "word": "abra,",
+          "start": 212.382,
+          "end": 212.946
+        },
+        {
+          "word": "ooh",
+          "start": 212.946,
+          "end": 213.191
+        },
+        {
+          "word": "na",
+          "start": 213.191,
+          "end": 213.644
+        },
+        {
+          "word": "na",
+          "start": 213.644,
+          "end": 214.535
+        }
+      ]
+    },
+    {
+      "verseStart": 214.535,
+      "verseEnd": 216.852,
+      "words": [
+        {
+          "word": "In",
+          "start": 214.535,
+          "end": 214.752
+        },
+        {
+          "word": "her",
+          "start": 214.752,
+          "end": 214.992
+        },
+        {
+          "word": "tongue,",
+          "start": 214.992,
+          "end": 215.469
+        },
+        {
+          "word": "she",
+          "start": 215.469,
+          "end": 215.652
+        },
+        {
+          "word": "said",
+          "start": 215.652,
+          "end": 216.452
+        }
+      ]
+    },
+    {
+      "verseStart": 216.888,
+      "verseEnd": 219.603,
+      "words": [
+        {
+          "word": "Death",
+          "start": 216.888,
+          "end": 217.363
+        },
+        {
+          "word": "or",
+          "start": 217.363,
+          "end": 217.811
+        },
+        {
+          "word": "love",
+          "start": 217.811,
+          "end": 218.277
+        },
+        {
+          "word": "tonight",
+          "start": 218.277,
+          "end": 219.203
+        }
+      ]
+    }
+  ]
+}

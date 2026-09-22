@@ -28,3 +28,4 @@ dist-ssr
 *.tsbuildinfo
 .dev.vars*
 .env*
+*.mp4
