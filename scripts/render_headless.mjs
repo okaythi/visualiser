@@ -2,6 +2,77 @@ import puppeteer from 'puppeteer';
 import { spawn, execSync } from 'child_process';
 import path from 'path';
 import fs from 'fs';
+import http from 'http';
+
+// Check if a server is already listening on the given port
+async function isServerRunning(port) {
+  return new Promise((resolve) => {
+    const req = http.get(`http://localhost:${port}/`, (res) => {
+      resolve(res.statusCode >= 200 && res.statusCode < 500);
+    });
+    req.on('error', () => resolve(false));
+    req.setTimeout(1000, () => {
+      req.destroy();
+      resolve(false);
+    });
+  });
+}
+
+// Built-in zero-dependency static file server for dist/
+function startStaticServer(port = 5173, rootDir = 'dist') {
+  const mimeTypes = {
+    '.html': 'text/html; charset=utf-8',
+    '.js': 'application/javascript; charset=utf-8',
+    '.mjs': 'application/javascript; charset=utf-8',
+    '.css': 'text/css; charset=utf-8',
+    '.json': 'application/json; charset=utf-8',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.svg': 'image/svg+xml',
+    '.fbx': 'application/octet-stream',
+    '.bin': 'application/octet-stream',
+    '.hdr': 'application/octet-stream',
+    '.mp3': 'audio/mpeg',
+    '.wav': 'audio/wav',
+    '.ttf': 'font/ttf',
+    '.woff': 'font/woff',
+    '.woff2': 'font/woff2',
+  };
+
+  const server = http.createServer((req, res) => {
+    let reqPath = decodeURI(req.url.split('?')[0]);
+    if (reqPath === '/' || reqPath === '') reqPath = '/index.html';
+
+    let filePath = path.join(rootDir, reqPath);
+    if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+      filePath = path.join(rootDir, 'index.html');
+    }
+
+    try {
+      const ext = path.extname(filePath).toLowerCase();
+      const contentType = mimeTypes[ext] || 'application/octet-stream';
+      const content = fs.readFileSync(filePath);
+      res.writeHead(200, {
+        'Content-Type': contentType,
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'no-cache',
+      });
+      res.end(content);
+    } catch {
+      res.writeHead(404);
+      res.end('File Not Found');
+    }
+  });
+
+  return new Promise((resolve, reject) => {
+    server.listen(port, '0.0.0.0', () => {
+      console.log(`✓ Started built-in static server on port ${port} serving '${rootDir}'`);
+      resolve(server);
+    });
+    server.on('error', reject);
+  });
+}
 
 // Parse command line arguments
 function parseArgs() {
@@ -71,6 +142,20 @@ async function main() {
 
   const out1440 = path.join(opts.outDir, 'Abracadabra_Stage_1440p60.mp4');
   const out1080 = path.join(opts.outDir, 'Abracadabra_Stage_1080p60.mp4');
+
+  // Ensure server is reachable, or launch internal zero-dependency static server
+  let internalServer = null;
+  const isUp = await isServerRunning(opts.port);
+  if (!isUp) {
+    console.log(`No active server on port ${opts.port}. Checking production build...`);
+    if (!fs.existsSync('dist/index.html')) {
+      console.log('Building production client bundle (npm run build)...');
+      execSync('npm run build', { stdio: 'inherit' });
+    }
+    internalServer = await startStaticServer(opts.port, 'dist');
+  } else {
+    console.log(`✓ Active server detected on port ${opts.port}`);
+  }
 
   // Launch Puppeteer with GPU acceleration flags FIRST (before spawning FFmpeg)
   console.log('Launching headless browser with GPU acceleration...');
@@ -244,6 +329,11 @@ async function main() {
   });
 
   await browser.close();
+
+  if (internalServer) {
+    console.log('Shutting down internal static server...');
+    internalServer.close();
+  }
 
   const totalTimeSec = ((Date.now() - startTime) / 1000).toFixed(1);
   console.log(`\n=== RENDER COMPLETE in ${totalTimeSec}s ===`);
