@@ -281,10 +281,7 @@ async function main() {
       '--disable-features=Translate',
       '--no-first-run',
       '--window-size=' + width + ',' + height,
-      '--force-gpu-mem-available-mb=32768',
-      '--gpu-memory-buffer-compositor-resources',
       '--max-active-webgl-contexts=32',
-      '--js-flags=--expose-gc',
       '--hide-scrollbars',
       '--mute-audio',
       '--enable-automation',
@@ -310,6 +307,7 @@ async function main() {
 
   const page = await browser.newPage();
   await page.setViewport({ width, height, deviceScaleFactor: 1 });
+  const cdpClient = await page.target().createCDPSession();
 
   const url = `http://localhost:${opts.port}/?render=1`;
   console.log(`Connecting to visualiser at ${url}...`);
@@ -414,33 +412,19 @@ async function main() {
       continue;
     }
 
-    // 1. Direct WebGL canvas readback via GPU Skia pipeline (100-150 FPS)
-    const qualityNorm = opts.quality / 100;
-    const base64Url = await page.evaluate((f, q) => {
-      return typeof window.__SEEK_FRAME__ === 'function'
-        ? window.__SEEK_FRAME__(f, q)
-        : null;
-    }, frame, qualityNorm);
+    // 1. Advance virtual clock to exact frame timestamp
+    await page.evaluate((f) => window.__SEEK_FRAME__(f), frame);
 
-    let frameBuffer;
-    if (base64Url && typeof base64Url === 'string' && base64Url.startsWith('data:image/jpeg;base64,')) {
-      frameBuffer = Buffer.from(base64Url.slice(23), 'base64');
-    } else {
-      frameBuffer = await page.screenshot({
-        type: opts.imageType,
-        quality: opts.imageType === 'jpeg' ? opts.quality : undefined,
-        omitBackground: false,
-      });
-    }
+    // 2. Direct hardware compositor surface capture (zero Skia image cache leaks, zero DOM overhead)
+    const { data } = await cdpClient.send('Page.captureScreenshot', {
+      format: opts.imageType === 'jpeg' ? 'jpeg' : 'png',
+      quality: opts.imageType === 'jpeg' ? opts.quality : undefined,
+      fromSurface: true,
+      captureBeyondViewport: false,
+    });
+    const frameBuffer = Buffer.from(data, 'base64');
 
-    // Force periodic V8 garbage collection to maintain ultra-lean RAM footprint
-    if (frame % 100 === 0) {
-      await page.evaluate(() => {
-        if (typeof window.gc === 'function') window.gc();
-      });
-    }
-
-    // 2. Save to disk (Strategy 1) or pipe to FFmpeg (Strategy 2)
+    // 3. Save to disk (Strategy 1) or pipe to FFmpeg (Strategy 2)
     if (opts.decoupled) {
       fs.writeFileSync(framePath, frameBuffer);
     } else {
