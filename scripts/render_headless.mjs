@@ -284,6 +284,7 @@ async function main() {
       '--force-gpu-mem-available-mb=32768',
       '--gpu-memory-buffer-compositor-resources',
       '--max-active-webgl-contexts=32',
+      '--js-flags=--expose-gc',
       '--hide-scrollbars',
       '--mute-audio',
       '--enable-automation',
@@ -413,17 +414,33 @@ async function main() {
       continue;
     }
 
-    // 1. Advance virtual clock to exact frame timestamp
-    await page.evaluate((f) => window.__SEEK_FRAME__(f), frame);
+    // 1. Direct WebGL canvas readback via GPU Skia pipeline (100-150 FPS)
+    const qualityNorm = opts.quality / 100;
+    const base64Url = await page.evaluate((f, q) => {
+      return typeof window.__SEEK_FRAME__ === 'function'
+        ? window.__SEEK_FRAME__(f, q)
+        : null;
+    }, frame, qualityNorm);
 
-    // 2. Native headless compositor capture (rendered 100% on GPU)
-    const frameBuffer = await page.screenshot({
-      type: opts.imageType,
-      quality: opts.imageType === 'jpeg' ? opts.quality : undefined,
-      omitBackground: false,
-    });
+    let frameBuffer;
+    if (base64Url && typeof base64Url === 'string' && base64Url.startsWith('data:image/jpeg;base64,')) {
+      frameBuffer = Buffer.from(base64Url.slice(23), 'base64');
+    } else {
+      frameBuffer = await page.screenshot({
+        type: opts.imageType,
+        quality: opts.imageType === 'jpeg' ? opts.quality : undefined,
+        omitBackground: false,
+      });
+    }
 
-    // 3. Save to disk (Strategy 1) or pipe to FFmpeg (Strategy 2)
+    // Force periodic V8 garbage collection to maintain ultra-lean RAM footprint
+    if (frame % 100 === 0) {
+      await page.evaluate(() => {
+        if (typeof window.gc === 'function') window.gc();
+      });
+    }
+
+    // 2. Save to disk (Strategy 1) or pipe to FFmpeg (Strategy 2)
     if (opts.decoupled) {
       fs.writeFileSync(framePath, frameBuffer);
     } else {

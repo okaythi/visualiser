@@ -20,15 +20,16 @@ function DeterministicBridge({
   isRenderMode: boolean;
   virtualTimeRef: React.MutableRefObject<number>;
 }) {
-  const { advance } = useThree();
+  const { advance, gl } = useThree();
 
   useEffect(() => {
     if (!isRenderMode) return;
 
-    (window as any).__SEEK_FRAME__ = (frameIndex: number) => {
+    (window as any).__SEEK_FRAME__ = (frameIndex: number, quality = 0.95) => {
       const t = frameIndex / 60.0;
       virtualTimeRef.current = t;
       advance(t);
+      return gl.domElement.toDataURL('image/jpeg', quality);
     };
 
     (window as any).__IS_READY_FOR_CAPTURE__ = () => {
@@ -42,7 +43,7 @@ function DeterministicBridge({
       delete (window as any).__SEEK_FRAME__;
       delete (window as any).__IS_READY_FOR_CAPTURE__;
     };
-  }, [isRenderMode, advance, virtualTimeRef]);
+  }, [isRenderMode, advance, gl, virtualTimeRef]);
 
   return null;
 }
