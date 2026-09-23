@@ -17,13 +17,31 @@ export const App: React.FC = () => {
 
   // Load telemetry manifest when available
   useEffect(() => {
-    fetch('/telemetry.json')
-      .then(r => r.json())
-      .then((data: TelemetryManifest) => setManifest(data))
-      .catch(() => {
-        // Telemetry not yet generated — visualiser runs in silent/offline mode.
-        console.info('[visualiser] No telemetry.json found — running in preview mode.');
-      });
+    const loadTelemetry = async () => {
+      try {
+        const res = await fetch('/telemetry.json.gz');
+        if (res.ok && res.body && typeof DecompressionStream !== 'undefined') {
+          const ds = new DecompressionStream('gzip');
+          const decompressed = res.body.pipeThrough(ds);
+          const data = (await new Response(decompressed).json()) as TelemetryManifest;
+          setManifest(data);
+          return;
+        }
+      } catch {}
+
+      try {
+        const res = await fetch('/telemetry.json');
+        if (res.ok) {
+          const data = (await res.json()) as TelemetryManifest;
+          setManifest(data);
+          return;
+        }
+      } catch {}
+
+      console.info('[visualiser] No telemetry found — running in preview mode.');
+    };
+
+    loadTelemetry();
   }, []);
 
   // Load lyrics when available
