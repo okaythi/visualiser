@@ -20,17 +20,19 @@ declare global {
   }
 }
 
+const BLOOM_ARGS: [undefined, undefined, number, number, number] = [undefined, undefined, 0.85, 0.8, 0.65];
+
 /**
  * Bloom post-processing using drei's <Effects> + UnrealBloomPass.
  * Compatible with @react-three/fiber v8. No @react-three/postprocessing needed.
  */
-export const BloomLayer: React.FC = () => (
+export const BloomLayer: React.FC = React.memo(() => (
   <Effects disableGamma>
     <unrealBloomPass
-      args={[undefined, undefined, 0.85, 0.8, 0.65]}
+      args={BLOOM_ARGS}
       strength={0.85}
       radius={0.8}
       threshold={0.65}
     />
   </Effects>
-);
+));

@@ -18,6 +18,10 @@ const EMPTY_ZONES: SpatialZones = {
   z7SkyVault:  { rms: 0, transient: 0 },
 };
 
+// Module-level static constants to prevent Drei MeshReflectorMaterial useMemo FBO recreation leak
+const REFLECTOR_BLUR: [number, number] = [120, 40];
+const REFLECTOR_NORMAL_SCALE = new THREE.Vector2(0.35, 0.35);
+
 export interface StageUniforms {
   uTime:     { value: number };
   uZ1Rms:    { value: number };
@@ -162,7 +166,7 @@ function StageAnimator({
   return null;
 }
 
-function StageModel(props: NeonStageProps) {
+const StageModel = React.memo(function StageModel(props: NeonStageProps) {
   const fbx = useFBX('/models/neon-stage/neon-stage.fbx');
   const ringRef      = useRef<THREE.Mesh | null>(null);
   const reflectorRef = useRef<any>(null);
@@ -412,7 +416,7 @@ function StageModel(props: NeonStageProps) {
         <planeGeometry args={[35, 45]} />
         <MeshReflectorMaterial
           ref={reflectorRef}
-          blur={[120, 40]}
+          blur={REFLECTOR_BLUR}
           resolution={2048}
           mixBlur={0.85}
           mixStrength={3.2}
@@ -426,7 +430,7 @@ function StageModel(props: NeonStageProps) {
           distortionMap={floorNormal}
           distortion={0.32}
           normalMap={floorNormal}
-          normalScale={new THREE.Vector2(0.35, 0.35)}
+          normalScale={REFLECTOR_NORMAL_SCALE}
           roughnessMap={floorRough}
           map={floorColor}
         />
@@ -547,9 +551,9 @@ function StageModel(props: NeonStageProps) {
       />
     </>
   );
-}
+});
 
-export const NeonStage: React.FC<NeonStageProps> = (props) => {
+export const NeonStage: React.FC<NeonStageProps> = React.memo((props) => {
   return (
     <>
       {/* Cavern ambient base fill */}
@@ -560,5 +564,5 @@ export const NeonStage: React.FC<NeonStageProps> = (props) => {
       </Suspense>
     </>
   );
-};
+});
 

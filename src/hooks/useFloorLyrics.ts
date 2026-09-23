@@ -46,6 +46,12 @@ export function useFloorLyrics(
   const lastWordKeyRef   = useRef('');
   const lastStampMs      = useRef(0);
   const ghostsRef        = useRef<Array<{ q: FloorQuadrant; o: number }>>([]);
+  const lastCommittedRef = useRef<{ word: string; quadId: string; opacity: number; hasGhosts: boolean }>({
+    word: '',
+    quadId: '',
+    opacity: 0,
+    hasGhosts: false,
+  });
 
   // Choreographed floor movement path across all 6 zones
   const QUADRANT_CHOREOGRAPHY = [3, 2, 4, 1, 5, 0];
@@ -185,14 +191,34 @@ export function useFloorLyrics(
     opacityRef.current += (targetOpacity - opacityRef.current) * Math.min(d * opacitySpeed, 1);
     scaleRef.current   += (1.0 - scaleRef.current) * Math.min(d * 14, 1);
 
-    // ── 6. Commit Snapshot to React State ─────────────────────────────────
-    setWordState({
-      word:           currentWordRef.current,
-      quadrant:       quadrantRef.current,
-      opacity:        opacityRef.current,
-      scale:          scaleRef.current,
-      ghostQuadrants: ghostsRef.current.map(g => ({ quadrant: g.q, opacity: g.o })),
-    });
+    // ── 6. Commit Snapshot to React State ONLY when state meaningfully changes ──
+    const roundedOpacity = Math.round(opacityRef.current * 10) / 10;
+    const currentWord = currentWordRef.current;
+    const currentQuad = quadrantRef.current.id;
+    const last = lastCommittedRef.current;
+    const hasGhosts = ghostsRef.current.length > 0;
+
+    const shouldUpdate =
+      currentWord !== last.word ||
+      currentQuad !== last.quadId ||
+      roundedOpacity !== last.opacity ||
+      hasGhosts !== last.hasGhosts;
+
+    if (shouldUpdate) {
+      lastCommittedRef.current = {
+        word: currentWord,
+        quadId: currentQuad,
+        opacity: roundedOpacity,
+        hasGhosts,
+      };
+      setWordState({
+        word:           currentWordRef.current,
+        quadrant:       quadrantRef.current,
+        opacity:        opacityRef.current,
+        scale:          scaleRef.current,
+        ghostQuadrants: ghostsRef.current.map(g => ({ quadrant: g.q, opacity: g.o })),
+      });
+    }
   });
 
   return wordState;
