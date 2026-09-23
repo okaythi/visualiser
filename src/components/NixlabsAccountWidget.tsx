@@ -13,13 +13,6 @@ export interface NixlabsUser {
   avatarUrl?: string;
 }
 
-export interface AppEntry {
-  id: string;
-  name: string;
-  description: string;
-  url: string;
-}
-
 interface SessionResponse {
   authenticated?: boolean;
   user?: {
@@ -28,10 +21,6 @@ interface SessionResponse {
     role?: string;
     avatarUrl?: string;
   };
-}
-
-interface EcosystemResponse {
-  apps?: AppEntry[];
 }
 
 export interface NixlabsAccountWidgetProps {
@@ -58,7 +47,6 @@ export const NixlabsAccountWidget: React.FC<NixlabsAccountWidgetProps> = ({
 }) => {
   const currentApp = detectCurrentApp(propApp);
   const [isOpen, setIsOpen] = useState(false);
-  const [apps, setApps] = useState<AppEntry[]>([]);
   const [sessionUser, setSessionUser] = useState<NixlabsUser | null>(propUser ?? null);
   const [theme, toggleTheme] = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -99,17 +87,6 @@ export const NixlabsAccountWidget: React.FC<NixlabsAccountWidgetProps> = ({
       isMounted = false;
     };
   }, [propUser]);
-
-  useEffect(() => {
-    fetch('/ecosystem.json')
-      .then((r) => r.json() as Promise<EcosystemResponse>)
-      .then((data: EcosystemResponse) => {
-        if (Array.isArray(data?.apps)) {
-          setApps(data.apps);
-        }
-      })
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -234,7 +211,6 @@ export const NixlabsAccountWidget: React.FC<NixlabsAccountWidgetProps> = ({
               <div className="nixlabs-header-details">
                 <div className="nixlabs-header-name-row">
                   <span className="nixlabs-user-name">Guest</span>
-                  <span className="nixlabs-role-badge" style={{ opacity: 0.65 }}>ANONYMOUS</span>
                 </div>
                 <span className="nixlabs-user-email">Not authenticated</span>
               </div>
@@ -249,39 +225,6 @@ export const NixlabsAccountWidget: React.FC<NixlabsAccountWidgetProps> = ({
               </a>
             </div>
           )}
-
-          <div className="nixlabs-card-divider" />
-
-          <div className="nixlabs-menu-section">
-            <div className="nixlabs-section-label">ECOSYSTEM</div>
-            <div className="nixlabs-apps-list">
-              {apps.map((app) => {
-                const isCurrent = app.id === currentApp;
-                return (
-                  <a
-                    key={app.id}
-                    href={app.url}
-                    className={`nixlabs-app-item ${isCurrent ? 'current' : ''}`}
-                    onClick={(e) => {
-                      if (isCurrent) {
-                        e.preventDefault();
-                        setIsOpen(false);
-                      }
-                    }}
-                  >
-                    <span className="nixlabs-app-indicator">{isCurrent ? '●' : '○'}</span>
-                    <div className="nixlabs-app-meta">
-                      <span className="nixlabs-app-name">
-                        {app.name}
-                        {isCurrent && <span className="nixlabs-current-tag"> (current)</span>}
-                      </span>
-                      <span className="nixlabs-app-desc">{app.description}</span>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
-          </div>
 
           <div className="nixlabs-card-divider" />
 
@@ -306,7 +249,7 @@ export const NixlabsAccountWidget: React.FC<NixlabsAccountWidgetProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <span>Sovereign Vault</span>
+                <span>Vault</span>
                 <span className="nixlabs-link-arrow">↗</span>
               </a>
             )}

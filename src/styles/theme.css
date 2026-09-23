@@ -470,67 +470,6 @@ body {
   margin-bottom: 0.2rem;
 }
 
-.nixlabs-apps-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.nixlabs-app-item {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.4rem 0.5rem;
-  border-radius: 6px;
-  text-decoration: none;
-  background-color: transparent;
-  border: 1px solid transparent;
-  transition: background-color 0.12s ease, border-color 0.12s ease;
-}
-
-.nixlabs-app-item:hover {
-  background-color: var(--bg-subtle);
-  border-color: var(--border);
-}
-
-.nixlabs-app-item.current {
-  background-color: var(--bg-subtle);
-  border-color: var(--border);
-}
-
-.nixlabs-app-indicator {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.nixlabs-app-item.current .nixlabs-app-indicator {
-  color: var(--border-focus);
-}
-
-.nixlabs-app-meta {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.nixlabs-app-name {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.nixlabs-current-tag {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  color: var(--border-focus);
-}
-
-.nixlabs-app-desc {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-}
-
 .nixlabs-action-row {
   display: flex;
   align-items: center;
