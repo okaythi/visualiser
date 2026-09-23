@@ -86,6 +86,11 @@ function parseArgs() {
     nvenc: true,
     audio: 'public/audio/abracadabra-mix.mp3',
     outDir: '.',
+    framesDir: 'frames', // Target directory for decoupled frame sequence
+    decoupled: true,     // Strategy 1 (Default): Decoupled VFX pipeline (GPU 3D render to disk -> FFmpeg CPU mux)
+    resume: false,       // In decoupled mode: skip existing frames already rendered
+    encodeOnly: false,   // Skip GPU render, only run FFmpeg Stage 2 on existing frames
+    cleanFrames: false,  // Remove frames directory after encoding
     imageType: 'jpeg',   // 'jpeg' (15x faster) or 'png'
     quality: 98,         // JPEG quality (98 = visually lossless, reference grade)
   };
@@ -99,6 +104,18 @@ function parseArgs() {
     else if (arg === '--port' && args[i + 1]) options.port = parseInt(args[++i], 10);
     else if (arg === '--audio' && args[i + 1]) options.audio = args[++i];
     else if (arg === '--out-dir' && args[i + 1]) options.outDir = args[++i];
+    else if (arg === '--frames-dir' && args[i + 1]) {
+      options.framesDir = args[++i];
+      options.decoupled = true;
+    }
+    else if (arg === '--decoupled') options.decoupled = true;
+    else if (arg === '--pipe') options.decoupled = false;
+    else if (arg === '--resume') {
+      options.resume = true;
+      options.decoupled = true;
+    }
+    else if (arg === '--encode-only') options.encodeOnly = true;
+    else if (arg === '--clean-frames') options.cleanFrames = true;
     else if (arg === '--no-nvenc') options.nvenc = false;
     else if (arg === '--nvenc') options.nvenc = true;
     else if (arg === '--png') options.imageType = 'png';
@@ -124,33 +141,110 @@ function checkNvencAvailable() {
   }
 }
 
+// Stage 2: Compress and mux rendered frame sequence into final video containers
+async function encodeDecoupledFrames(opts, width, height, hasNvenc, vcodec, out1440, out1080, ext) {
+  console.log('\n================================================================');
+  console.log('  STAGE 2: VIDEO COMPRESSION & CONTAINER MUXING (FFmpeg)');
+  console.log(`  Source frames: ${path.join(opts.framesDir, `frame_%05d.${ext}`)}`);
+  console.log(`  Audio track:   ${opts.audio}`);
+  console.log(`  Video Codec:   ${vcodec} (${hasNvenc ? 'Nvidia NVENC Hardware' : 'Multi-threaded CPU libx264 -preset veryfast'})`);
+  console.log('================================================================');
+
+  const ffmpegArgs = [
+    '-hide_banner',
+    '-loglevel', 'warning',
+    '-y',
+    '-framerate', `${opts.fps}`,
+    '-start_number', `${opts.start}`,
+    '-i', path.join(opts.framesDir, `frame_%05d.${ext}`),
+    '-i', opts.audio,
+  ];
+
+  if (opts.format === 'both') {
+    console.log(`Outputs will be compressed simultaneously:\n  -> ${out1440}\n  -> ${out1080}`);
+    ffmpegArgs.push(
+      '-filter_complex', '[0:v]split=2[v1440][v1080_in];[v1080_in]scale=1920:1080:flags=bicubic[v1080]',
+      '-map', '[v1440]', '-map', '1:a',
+      '-c:v', vcodec,
+      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '35M'] : ['-preset', 'veryfast', '-threads', '0', '-crf', '17']),
+      '-pix_fmt', 'yuv420p',
+      '-c:a', 'aac', '-b:a', '320k',
+      out1440,
+      '-map', '[v1080]', '-map', '1:a',
+      '-c:v', vcodec,
+      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '22M'] : ['-preset', 'veryfast', '-threads', '0', '-crf', '18']),
+      '-pix_fmt', 'yuv420p',
+      '-c:a', 'aac', '-b:a', '320k',
+      out1080
+    );
+  } else if (opts.format === '1440p') {
+    ffmpegArgs.push(
+      '-c:v', vcodec,
+      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '35M'] : ['-preset', 'veryfast', '-threads', '0', '-crf', '17']),
+      '-pix_fmt', 'yuv420p',
+      '-c:a', 'aac', '-b:a', '320k',
+      out1440
+    );
+  } else {
+    ffmpegArgs.push(
+      '-c:v', vcodec,
+      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '22M'] : ['-preset', 'veryfast', '-threads', '0', '-crf', '18']),
+      '-pix_fmt', 'yuv420p',
+      '-c:a', 'aac', '-b:a', '320k',
+      out1080
+    );
+  }
+
+  const ffmpeg = spawn('ffmpeg', ffmpegArgs, { stdio: 'inherit' });
+  await new Promise((resolve, reject) => {
+    ffmpeg.on('close', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`FFmpeg exited with code ${code}`));
+    });
+    ffmpeg.on('error', reject);
+  });
+}
+
 async function main() {
   const opts = parseArgs();
-  console.log('=== Lady Gaga "Abracadabra" 7-Zone Stage Headless Render Pipeline ===');
-  console.log(`Target frames: ${opts.frames} (${(opts.frames / opts.fps).toFixed(2)}s @ ${opts.fps} FPS)`);
-  console.log(`Format: ${opts.format.toUpperCase()}`);
+  const ext = opts.imageType === 'jpeg' ? 'jpg' : 'png';
+
+  // Determine render resolution: if format is 1440p or both, render at 2560x1440
+  const is1440 = opts.format === '1440p' || opts.format === 'both';
+  const width = is1440 ? 2560 : 1920;
+  const height = is1440 ? 1440 : 1080;
+
+  const out1440 = path.join(opts.outDir, 'Abracadabra_Stage_1440p60.mp4');
+  const out1080 = path.join(opts.outDir, 'Abracadabra_Stage_1080p60.mp4');
 
   const hasNvenc = opts.nvenc && checkNvencAvailable();
   const vcodec = hasNvenc ? 'h264_nvenc' : 'libx264';
-  if (hasNvenc) {
-    console.log('Video encoder: h264_nvenc (NVIDIA Hardware NVENC Accelerated)');
-  } else {
-    console.log('Video encoder: libx264 (Multi-threaded CPU encoding; HPC GPU A100 detected or NVENC omitted)');
-  }
 
   if (!fs.existsSync(opts.audio)) {
     console.error(`ERROR: Audio file not found at ${opts.audio}`);
     process.exit(1);
   }
 
-  // Determine render resolution: if format is 1440p or both, render at 2560x1440
-  const is1440 = opts.format === '1440p' || opts.format === 'both';
-  const width = is1440 ? 2560 : 1920;
-  const height = is1440 ? 1440 : 1080;
-  console.log(`Viewport render resolution: ${width}x${height}`);
+  // Support Stage 2 Encode-Only execution directly on existing frame sequence
+  if (opts.encodeOnly) {
+    console.log('Encode-only mode requested. Skipping Stage 1 3D render...');
+    await encodeDecoupledFrames(opts, width, height, hasNvenc, vcodec, out1440, out1080, ext);
+    return;
+  }
 
-  const out1440 = path.join(opts.outDir, 'Abracadabra_Stage_1440p60.mp4');
-  const out1080 = path.join(opts.outDir, 'Abracadabra_Stage_1080p60.mp4');
+  console.log('================================================================');
+  console.log('  LADY GAGA "ABRACADABRA" 7-ZONE 3D SPATIAL CAVERN VISUALISER');
+  console.log('================================================================');
+  console.log(`  Target frames:      ${opts.frames} (${(opts.frames / opts.fps).toFixed(2)}s @ ${opts.fps} FPS)`);
+  console.log(`  Output format:      ${opts.format.toUpperCase()}`);
+  console.log(`  Render resolution:  ${width}x${height} (A100 GPU Framebuffer)`);
+  console.log(`  Pipeline strategy:  ${opts.decoupled ? 'Strategy 1: Decoupled Frames (VFX Standard)' : 'Strategy 2: Direct Stream Pipe'}`);
+  console.log(`  Video encoder:      ${vcodec} (${hasNvenc ? 'NVENC GPU Hardware' : 'Multi-threaded CPU libx264 -preset veryfast'})`);
+  console.log('================================================================');
+
+  if (opts.decoupled && !fs.existsSync(opts.framesDir)) {
+    fs.mkdirSync(opts.framesDir, { recursive: true });
+  }
 
   // Ensure server is reachable, or launch internal zero-dependency static server
   let internalServer = null;
@@ -166,7 +260,7 @@ async function main() {
     console.log(`✓ Active server detected on port ${opts.port}`);
   }
 
-  // Launch Puppeteer with GPU acceleration flags FIRST (before spawning FFmpeg)
+  // Launch Puppeteer with GPU acceleration flags FIRST
   console.log('Launching headless browser with GPU acceleration...');
   const launchOptions = {
     headless: 'new',
@@ -238,93 +332,111 @@ async function main() {
   });
   const isHardwareGpu = !glRenderer.toLowerCase().includes('swiftshader') && !glRenderer.toLowerCase().includes('llvmpipe');
   console.log('================================================================');
+  console.log(`  STAGE 1: 3D GPU RENDERING ENGINE (100% on GPU)`);
   console.log(`  RENDER ACCELERATOR:  ${glRenderer}`);
   console.log(`  HARDWARE GPU ACTIVE: ${isHardwareGpu ? 'YES (Nvidia Hardware Acceleration)' : 'NO (CPU SwiftShader Fallback - run Cell 3 to install libnvidia-gl)'}`);
+  console.log(`  FRAME BUFFER CAP:    ${width}x${height} @ ${opts.fps} FPS`);
+  console.log(`  CAPTURE FORMAT:      ${opts.imageType.toUpperCase()} (quality: ${opts.quality})`);
   console.log('================================================================');
-  console.log(`Capture format: ${opts.imageType.toUpperCase()}${opts.imageType === 'jpeg' ? ` (quality: ${opts.quality})` : ''}`);
-  console.log('Stage ready! Starting deterministic frame-by-frame rendering...');
+  console.log('Stage ready! Starting frame-by-frame 3D GPU rendering...');
 
-  // Build FFmpeg argument list with explicit input dimensions and per-output stream options
-  let ffmpegArgs = [
-    '-hide_banner',
-    '-loglevel', 'warning',
-    '-y',
-    '-thread_queue_size', '512',
-    '-f', 'image2pipe',
-    '-vcodec', opts.imageType === 'jpeg' ? 'mjpeg' : 'png',
-    '-s', `${width}x${height}`,
-    '-r', `${opts.fps}`,
-    '-i', '-',
-    '-thread_queue_size', '512',
-    '-i', opts.audio,
-  ];
+  let ffmpeg = null;
+  if (!opts.decoupled) {
+    // Strategy 2: Direct stream pipe to FFmpeg
+    let ffmpegArgs = [
+      '-hide_banner',
+      '-loglevel', 'warning',
+      '-y',
+      '-thread_queue_size', '512',
+      '-f', 'image2pipe',
+      '-vcodec', opts.imageType === 'jpeg' ? 'mjpeg' : 'png',
+      '-s', `${width}x${height}`,
+      '-r', `${opts.fps}`,
+      '-i', '-',
+      '-thread_queue_size', '512',
+      '-i', opts.audio,
+    ];
 
-  if (opts.format === 'both') {
-    console.log(`Outputs will be generated simultaneously:\n  -> ${out1440}\n  -> ${out1080}`);
-    ffmpegArgs.push(
-      '-filter_complex', '[0:v]split=2[v1440][v1080_in];[v1080_in]scale=1920:1080:flags=bicubic[v1080]',
-      '-map', '[v1440]', '-map', '1:a',
-      '-c:v', vcodec,
-      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '35M'] : ['-preset', 'faster', '-threads', '0', '-crf', '17']),
-      '-pix_fmt', 'yuv420p',
-      '-c:a', 'aac', '-b:a', '320k',
-      out1440,
-      '-map', '[v1080]', '-map', '1:a',
-      '-c:v', vcodec,
-      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '22M'] : ['-preset', 'faster', '-threads', '0', '-crf', '18']),
-      '-pix_fmt', 'yuv420p',
-      '-c:a', 'aac', '-b:a', '320k',
-      out1080
-    );
-  } else if (opts.format === '1440p') {
-    ffmpegArgs.push(
-      '-c:v', vcodec,
-      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '35M'] : ['-preset', 'faster', '-threads', '0', '-crf', '17']),
-      '-pix_fmt', 'yuv420p',
-      '-c:a', 'aac', '-b:a', '320k',
-      out1440
-    );
-  } else {
-    ffmpegArgs.push(
-      '-c:v', vcodec,
-      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '22M'] : ['-preset', 'faster', '-threads', '0', '-crf', '18']),
-      '-pix_fmt', 'yuv420p',
-      '-c:a', 'aac', '-b:a', '320k',
-      out1080
-    );
+    if (opts.format === 'both') {
+      console.log(`Outputs will be streamed simultaneously:\n  -> ${out1440}\n  -> ${out1080}`);
+      ffmpegArgs.push(
+        '-filter_complex', '[0:v]split=2[v1440][v1080_in];[v1080_in]scale=1920:1080:flags=bicubic[v1080]',
+        '-map', '[v1440]', '-map', '1:a',
+        '-c:v', vcodec,
+        ...(hasNvenc ? ['-preset', 'p7', '-b:v', '35M'] : ['-preset', 'veryfast', '-threads', '0', '-crf', '17']),
+        '-pix_fmt', 'yuv420p',
+        '-c:a', 'aac', '-b:a', '320k',
+        out1440,
+        '-map', '[v1080]', '-map', '1:a',
+        '-c:v', vcodec,
+        ...(hasNvenc ? ['-preset', 'p7', '-b:v', '22M'] : ['-preset', 'veryfast', '-threads', '0', '-crf', '18']),
+        '-pix_fmt', 'yuv420p',
+        '-c:a', 'aac', '-b:a', '320k',
+        out1080
+      );
+    } else if (opts.format === '1440p') {
+      ffmpegArgs.push(
+        '-c:v', vcodec,
+        ...(hasNvenc ? ['-preset', 'p7', '-b:v', '35M'] : ['-preset', 'veryfast', '-threads', '0', '-crf', '17']),
+        '-pix_fmt', 'yuv420p',
+        '-c:a', 'aac', '-b:a', '320k',
+        out1440
+      );
+    } else {
+      ffmpegArgs.push(
+        '-c:v', vcodec,
+        ...(hasNvenc ? ['-preset', 'p7', '-b:v', '22M'] : ['-preset', 'veryfast', '-threads', '0', '-crf', '18']),
+        '-pix_fmt', 'yuv420p',
+        '-c:a', 'aac', '-b:a', '320k',
+        out1080
+      );
+    }
+
+    ffmpeg = spawn('ffmpeg', ffmpegArgs, { stdio: ['pipe', 'inherit', 'inherit'] });
+    ffmpeg.on('error', (err) => {
+      console.error('FFmpeg process error:', err);
+      process.exit(1);
+    });
   }
-
-  const ffmpeg = spawn('ffmpeg', ffmpegArgs, { stdio: ['pipe', 'inherit', 'inherit'] });
-
-  ffmpeg.on('error', (err) => {
-    console.error('FFmpeg process error:', err);
-    process.exit(1);
-  });
 
   const startTime = Date.now();
   let renderStartTime = startTime;
 
   for (let frame = opts.start; frame < opts.frames; frame++) {
+    const frameFilename = `frame_${frame.toString().padStart(5, '0')}.${ext}`;
+    const framePath = path.join(opts.framesDir, frameFilename);
+
+    if (opts.decoupled && opts.resume && fs.existsSync(framePath) && fs.statSync(framePath).size > 0) {
+      if (frame % 500 === 0) {
+        console.log(`[Resume] Frame ${frame}/${opts.frames} already exists on disk, skipping...`);
+      }
+      continue;
+    }
+
     // 1. Advance virtual clock to exact frame timestamp
     await page.evaluate((f) => window.__SEEK_FRAME__(f), frame);
 
-    // 2. Native headless compositor capture (zero VRAM memory leaks, immediate surface reclamation)
+    // 2. Native headless compositor capture (rendered 100% on GPU)
     const frameBuffer = await page.screenshot({
       type: opts.imageType,
       quality: opts.imageType === 'jpeg' ? opts.quality : undefined,
       omitBackground: false,
     });
 
-    // 3. Pipe raw frame to FFmpeg with backpressure handling
-    const canWrite = ffmpeg.stdin.write(frameBuffer);
-    if (!canWrite) {
-      await new Promise((resolve) => ffmpeg.stdin.once('drain', resolve));
+    // 3. Save to disk (Strategy 1) or pipe to FFmpeg (Strategy 2)
+    if (opts.decoupled) {
+      fs.writeFileSync(framePath, frameBuffer);
+    } else {
+      const canWrite = ffmpeg.stdin.write(frameBuffer);
+      if (!canWrite) {
+        await new Promise((resolve) => ffmpeg.stdin.once('drain', resolve));
+      }
     }
 
     // Warmup frame handling: calibrate active timer after first frame
     if (frame === opts.start) {
       renderStartTime = Date.now();
-      console.log(`[Frame ${frame.toString().padStart(5)}/${opts.frames}] GPU pipeline & shaders calibrated. Starting render stream...`);
+      console.log(`[Frame ${frame.toString().padStart(5)}/${opts.frames}] GPU pipeline & shaders calibrated. Starting render...`);
       continue;
     }
 
@@ -350,15 +462,17 @@ async function main() {
     }
   }
 
-  console.log('All frames rendered! Closing pipe to FFmpeg...');
-  ffmpeg.stdin.end();
+  if (!opts.decoupled) {
+    console.log('All frames rendered! Closing pipe to FFmpeg...');
+    ffmpeg.stdin.end();
 
-  await new Promise((resolve) => {
-    ffmpeg.on('close', (code) => {
-      console.log(`FFmpeg exited with code ${code}`);
-      resolve();
+    await new Promise((resolve) => {
+      ffmpeg.on('close', (code) => {
+        console.log(`FFmpeg exited with code ${code}`);
+        resolve();
+      });
     });
-  });
+  }
 
   await browser.close();
 
@@ -367,8 +481,24 @@ async function main() {
     internalServer.close();
   }
 
+  const renderTimeSec = ((Date.now() - startTime) / 1000).toFixed(1);
+  console.log(`\n✓ STAGE 1 COMPLETE: 13,600 frames 3D GPU rendered in ${renderTimeSec}s`);
+
+  // Stage 2 for decoupled pipeline
+  if (opts.decoupled) {
+    const encodeStart = Date.now();
+    await encodeDecoupledFrames(opts, width, height, hasNvenc, vcodec, out1440, out1080, ext);
+    const encodeTimeSec = ((Date.now() - encodeStart) / 1000).toFixed(1);
+    console.log(`✓ STAGE 2 COMPLETE: Video compression & muxing finished in ${encodeTimeSec}s`);
+
+    if (opts.cleanFrames && fs.existsSync(opts.framesDir)) {
+      console.log(`Cleaning up temporary frames directory: ${opts.framesDir}...`);
+      fs.rmSync(opts.framesDir, { recursive: true, force: true });
+    }
+  }
+
   const totalTimeSec = ((Date.now() - startTime) / 1000).toFixed(1);
-  console.log(`\n=== RENDER COMPLETE in ${totalTimeSec}s ===`);
+  console.log(`\n=== PIPELINE FINISHED in ${totalTimeSec}s ===`);
 
   if (opts.format === 'both' || opts.format === '1440p') {
     if (fs.existsSync(out1440)) {
