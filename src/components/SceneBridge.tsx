@@ -52,17 +52,17 @@ function CameraDirector({
     const bassRms = bassRmsRef.current ?? 0;
     const elapsedTime = isRenderMode && virtualTimeRef ? virtualTimeRef.current : state.clock.getElapsedTime();
 
-    // Physical elastic impulse on kick impact
-    if (kickTransient > 0.35) {
-      recoilRef.current += kickTransient * 0.035;
+    // Physical elastic impulse on kick impact (smoothly cushioned)
+    if (kickTransient > 0.40) {
+      recoilRef.current += kickTransient * 0.015;
     }
     // Damped spring recoil return
-    recoilRef.current += (0 - recoilRef.current) * Math.min(d * 10, 1);
+    recoilRef.current += (0 - recoilRef.current) * Math.min(d * 8, 1);
 
     // Subtle bass physical tremor
-    const bassTremor = bassRms * 0.012 * Math.sin(elapsedTime * 16);
+    const bassTremor = bassRms * 0.004 * Math.sin(elapsedTime * 16);
 
-    camera.position.set(0.40, 1.95 + bassTremor - recoilRef.current * 0.25, 6.20 + recoilRef.current);
+    camera.position.set(0.40, 1.95 + bassTremor - recoilRef.current * 0.10, 6.20 + recoilRef.current * 0.25);
     camera.lookAt(LOOK_TARGET);
   });
 
@@ -108,24 +108,26 @@ export const SceneBridge: React.FC<SceneBridgeProps> = ({
     const syn1 = read('SYN1 STEM');
     const syn3 = read('SYN3 STEM');
     const bgv1 = read('BGV1 STEM');
-    const z2Rms = Math.max(gtr1.rms, syn1.rms, syn3.rms) * 1.35 + bgv1.rms * 0.9;
+    const z2Rms = Math.max(gtr1.rms, syn1.rms, syn3.rms) * 1.35 + bgv1.rms * 0.9 + z1Rms * 0.05;
     const z2Trans = Math.max(gtr1.transient, syn1.transient, bgv1.transient);
 
-    // ── Zone 3: Right Far Monoliths (GTR2, SYN2, SYN4, BGV2) ───────────────
-    const gtr2 = read('GTR2 STEM');
-    const syn2 = read('SYN2 STEM');
-    const syn4 = read('SYN4 STEM');
-    const bgv2 = read('BGV2 STEM');
-    const z3Rms = Math.max(syn2.rms, bgv2.rms, syn4.rms) * 1.35 + gtr2.rms * 0.9;
-    const z3Trans = Math.max(syn2.transient, bgv2.transient, gtr2.transient);
+    // ── Zone 3: Right Far Monoliths (GTR2, SYN2, SYN4, BGV2, LEAD SYNTH) ───
+    const gtr2  = read('GTR2 STEM');
+    const syn2  = read('SYN2 STEM');
+    const syn4  = read('SYN4 STEM');
+    const bgv2  = read('BGV2 STEM');
+    const ldsyn = read('lead_synth');
+    const z3Rms = Math.max(syn2.rms, bgv2.rms, syn4.rms, ldsyn.rms) * 1.35 + gtr2.rms * 0.9 + z1Rms * 0.05;
+    const z3Trans = Math.max(syn2.transient, bgv2.transient, gtr2.transient, ldsyn.transient);
 
-    // ── Zone 4: Left Near Pillars (CLAPS, FILLS, BGV3, FX) ─────────────────
+    // ── Zone 4: Left Near Pillars (CLAPS, FILLS, BGV3, SNARE, FX) ──────────
     const claps = read('CLAPS STEM');
     const fills = read('FILLS STEM');
     const bgv3  = read('BGV3 STEM');
     const fx    = read('FX STEM');
-    const z4Rms = (claps.rms + fills.rms + bgv3.rms + fx.rms) / 2.6;
-    const z4Trans = Math.max(claps.transient, fills.transient);
+    const snare = read('snare');
+    const z4Rms = (claps.rms + fills.rms + bgv3.rms + fx.rms + snare.rms * 0.8) / 2.6;
+    const z4Trans = Math.max(claps.transient, fills.transient, snare.transient);
 
     // ── Zone 5: Right Near Pillars (HATS, VOCODER, VOX FX, GTR3) ───────────
     const hats  = read('hats');

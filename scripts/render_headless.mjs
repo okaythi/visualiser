@@ -425,6 +425,12 @@ async function main() {
     // 3. Save to disk (Strategy 1) or pipe to FFmpeg (Strategy 2)
     if (opts.decoupled) {
       fs.writeFileSync(framePath, frameBuffer);
+      if (fs.existsSync('/content/drive/MyDrive') && (frame === opts.start || frame === 100)) {
+        try {
+          fs.copyFileSync(framePath, '/content/drive/MyDrive/preview_frame.jpg');
+          console.log(`  ✓ Synced live preview to Google Drive: /content/drive/MyDrive/preview_frame.jpg`);
+        } catch {}
+      }
     } else {
       const canWrite = ffmpeg.stdin.write(frameBuffer);
       if (!canWrite) {

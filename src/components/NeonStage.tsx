@@ -323,17 +323,17 @@ const StageModel = React.memo(function StageModel(props: NeonStageProps) {
               float caustic2 = pow(cos(vAngle * 8.0 + causticPhase * 1.3) * 0.5 + 0.5, 4.0);
               float liquidCaustic = (caustic1 + caustic2) * (uZ1Rms * 1.2 + (uZ2Rms + uZ3Rms) * 0.6);
 
-              // Spatial color gradient: Crimson/rose plasma (#e11d48) to royal purple (#9333ea)
+              // Spatial color gradient: Crimson/magenta on left to electric cyan/blue on right
               float lrMix = cos(vAngle) * 0.5 + 0.5; // 0 on left, 1 on right
-              vec3 cRose   = vec3(0.88, 0.11, 0.28);
-              vec3 cPurple = vec3(0.58, 0.20, 0.92);
-              vec3 cWhite  = vec3(1.00, 0.99, 1.00); // incandescent white-hot liquid core
+              vec3 cMagenta = vec3(0.95, 0.12, 0.65);
+              vec3 cCyan    = vec3(0.00, 0.85, 1.00);
+              vec3 cWhite   = vec3(1.00, 0.99, 1.00); // incandescent white-hot liquid core
 
-              vec3 baseColor = mix(cRose, cPurple, lrMix);
+              vec3 baseColor = mix(cMagenta, cCyan, lrMix);
               vec3 fluidColor = mix(baseColor, cWhite, clamp(waveCrest * 0.65 + uZ1Trans * 0.75, 0.0, 1.0));
 
               // Emissive radiance: strictly proportional to audio
-              float ringGlow = 2.4 + uZ1Rms * 2.5 + uZ1Trans * 3.0 + waveCrest * 1.4 + liquidCaustic * 0.8;
+              float ringGlow = 3.6 + uZ1Rms * 3.5 + uZ1Trans * 4.0 + waveCrest * 1.8 + liquidCaustic * 1.0;
               totalEmissiveRadiance = fluidColor * ringGlow;
               `
             );
@@ -346,18 +346,129 @@ const StageModel = React.memo(function StageModel(props: NeonStageProps) {
           break;
         }
 
-        case 'Cylinder067': {
-          // Cyberpunk 2077 / GTA 6 Photorealistic Volcanic Obsidian Glass:
-          // Ultra-slick glossy black crystal with mirror clearcoat reflecting ray-traced shadows and specular light glints
+        case 'Cylinder067':
+        case 'Cylinder.067': {
+          // Volcanic Obsidian Glass with physical stem-coupled emissive facet lighting
           const monolithMat = new THREE.MeshPhysicalMaterial({
-            color: new THREE.Color(0x050508),
-            roughness: 0.10,
-            metalness: 0.15,
-            clearcoat: 1.0,
-            clearcoatRoughness: 0.05,
-            reflectivity: 0.95,
-            envMapIntensity: 1.6,
+            color: new THREE.Color(0x06040a),
+            roughness: 0.22,
+            metalness: 0.10,
+            clearcoat: 0.25,
+            clearcoatRoughness: 0.15,
+            reflectivity: 0.35,
+            envMapIntensity: 0.55,
           });
+
+          // Inject 7-zone spatial audio energy directly into the obsidian surface
+          monolithMat.onBeforeCompile = (shader) => {
+            shader.uniforms.uTime    = uniformsRef.current.uTime;
+            shader.uniforms.uZ1Rms   = uniformsRef.current.uZ1Rms;
+            shader.uniforms.uZ2Rms   = uniformsRef.current.uZ2Rms;
+            shader.uniforms.uZ2Trans = uniformsRef.current.uZ2Trans;
+            shader.uniforms.uZ3Rms   = uniformsRef.current.uZ3Rms;
+            shader.uniforms.uZ3Trans = uniformsRef.current.uZ3Trans;
+            shader.uniforms.uZ4Rms   = uniformsRef.current.uZ4Rms;
+            shader.uniforms.uZ4Trans = uniformsRef.current.uZ4Trans;
+            shader.uniforms.uZ5Rms   = uniformsRef.current.uZ5Rms;
+            shader.uniforms.uZ5Trans = uniformsRef.current.uZ5Trans;
+            shader.uniforms.uZ7Rms   = uniformsRef.current.uZ7Rms;
+
+            shader.vertexShader = `
+              varying vec3 vMonolithWorldPos;
+              varying vec3 vMonolithWorldNormal;
+              ${shader.vertexShader}
+            `;
+            shader.vertexShader = shader.vertexShader.replace(
+              '#include <begin_vertex>',
+              `
+              #include <begin_vertex>
+              vMonolithWorldPos = (modelMatrix * vec4(transformed, 1.0)).xyz;
+              vMonolithWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+              `
+            );
+
+            shader.fragmentShader = `
+              uniform float uTime;
+              uniform float uZ1Rms;
+              uniform float uZ2Rms;
+              uniform float uZ2Trans;
+              uniform float uZ3Rms;
+              uniform float uZ3Trans;
+              uniform float uZ4Rms;
+              uniform float uZ4Trans;
+              uniform float uZ5Rms;
+              uniform float uZ5Trans;
+              uniform float uZ7Rms;
+              varying vec3 vMonolithWorldPos;
+              varying vec3 vMonolithWorldNormal;
+              ${shader.fragmentShader}
+            `;
+
+            shader.fragmentShader = shader.fragmentShader.replace(
+              '#include <emissivemap_fragment>',
+              `
+              #include <emissivemap_fragment>
+              float wx = vMonolithWorldPos.x;
+              float wy = vMonolithWorldPos.y;
+              float wz = vMonolithWorldPos.z;
+
+              bool isLeft = wx < 0.8045;
+
+              // Facing angles
+              vec3 viewDir = normalize(cameraPosition - vMonolithWorldPos);
+              float fresnel = pow(1.0 - max(dot(viewDir, vMonolithWorldNormal), 0.0), 2.8);
+
+              // Vector toward portal singularity
+              vec3 toPortal = normalize(vec3(0.8045, 2.26, -5.74) - vMonolithWorldPos);
+              float portalFacing = clamp(dot(vMonolithWorldNormal, toPortal), 0.0, 1.0);
+
+              // Spatial Zone Color Tint:
+              // Left: Deep royal purple (#9333ea) to hot magenta (#e11d48)
+              // Right: Electric cyan (#00f0ff) to sapphire blue (#2563eb)
+              vec3 cPurple = vec3(0.65, 0.15, 0.95);
+              vec3 cMagenta = vec3(0.92, 0.12, 0.55);
+              vec3 cCyan = vec3(0.00, 0.85, 1.00);
+              vec3 cBlue = vec3(0.12, 0.40, 0.95);
+
+              float depthMix = clamp((-wz - 0.5) / 4.5, 0.0, 1.0);
+
+              vec3 zoneColor = vec3(0.0);
+              float zoneEnergy = 0.0;
+
+              if (isLeft) {
+                float eFar = uZ2Rms * 2.2 + uZ2Trans * 2.0;
+                float eNear = uZ4Rms * 1.8 + uZ4Trans * 1.6;
+                zoneEnergy = mix(eNear, eFar, depthMix);
+                zoneColor = mix(cPurple, cMagenta, clamp(uZ2Trans * 0.8, 0.0, 1.0));
+              } else {
+                float eFar = uZ3Rms * 2.2 + uZ3Trans * 2.0;
+                float eNear = uZ5Rms * 1.8 + uZ5Trans * 1.6;
+                zoneEnergy = mix(eNear, eFar, depthMix);
+                zoneColor = mix(cBlue, cCyan, clamp(uZ3Trans * 0.8, 0.0, 1.0));
+              }
+
+              // Top spire aura (Zone 7 Choir / Strings)
+              if (wy > 2.2) {
+                float heightFactor = clamp((wy - 2.2) / 3.0, 0.0, 1.0);
+                vec3 cZenith = vec3(0.68, 0.25, 0.98);
+                zoneColor += cZenith * (uZ7Rms * 2.0 * heightFactor);
+                zoneEnergy += uZ7Rms * 1.2 * heightFactor;
+              }
+
+              // Emissive coupling: rim fresnel + portal light + stem energy
+              float surfaceLuminance = (fresnel * 0.85 + portalFacing * 0.45) * zoneEnergy;
+              vec3 rockEmissive = zoneColor * surfaceLuminance;
+
+              // Transients add subtle white-hot rim glint
+              float trans = isLeft ? uZ2Trans : uZ3Trans;
+              if (trans > 0.35) {
+                rockEmissive += vec3(0.9, 0.9, 1.0) * pow(trans, 2.0) * fresnel * 0.8;
+              }
+
+              totalEmissiveRadiance += rockEmissive;
+              `
+            );
+          };
 
           obj.material = monolithMat;
           obj.castShadow = true;
@@ -419,14 +530,14 @@ const StageModel = React.memo(function StageModel(props: NeonStageProps) {
           blur={REFLECTOR_BLUR}
           resolution={2048}
           mixBlur={0.85}
-          mixStrength={3.2}
-          roughness={0.12}
+          mixStrength={1.4}
+          roughness={0.30}
           depthScale={1.2}
           minDepthThreshold={0.4}
           maxDepthThreshold={1.4}
-          color="#111116"
-          metalness={0.7}
-          mirror={0.85}
+          color="#0c0914"
+          metalness={0.45}
+          mirror={0.45}
           distortionMap={floorNormal}
           distortion={0.32}
           normalMap={floorNormal}
@@ -436,27 +547,18 @@ const StageModel = React.memo(function StageModel(props: NeonStageProps) {
         />
       </mesh>
 
-      {/* Atmospheric Cavern Hemisphere Light (purple sky fill / cyan ground bounce) */}
-      <hemisphereLight color="#a855f7" groundColor="#0369a1" intensity={0.50} />
+      {/* Atmospheric Cavern Hemisphere Light (purple sky fill / midnight ground bounce) */}
+      <hemisphereLight color="#3b0764" groundColor="#0a0515" intensity={0.20} />
 
       {/* Overhead Directional Rim & Contact Grounding Shadow Light */}
       <directionalLight
         position={[0.8, 12.0, 1.5]}
-        intensity={0.85}
+        intensity={0.65}
         color="#c084fc"
         castShadow
         shadow-mapSize-width={4096}
         shadow-mapSize-height={4096}
         shadow-bias={-0.0001}
-      />
-
-      {/* Mid-Corridor Ambient Fill to illuminate walkway & foreground crystals */}
-      <pointLight
-        position={[0.8, 2.8, -1.0]}
-        color="#7c3aed"
-        intensity={1.2}
-        distance={22}
-        decay={2}
       />
 
       {/* ── 7 Native Physical 3D Spatial Zone Lights (decay=2 quadratic physical dropoff) ── */}

@@ -62,18 +62,18 @@ export const VisualisrCanvas: React.FC<VisualisrSceneProps> = (props) => {
       frameloop={isRenderMode ? 'never' : 'always'}
       gl={{
         antialias: true,
-        toneMapping: THREE.AgXToneMapping,
-        toneMappingExposure: 1.2,
+        toneMapping: THREE.ACESFilmicToneMapping,
+        toneMappingExposure: 0.95,
         powerPreference: 'high-performance',
       }}
       onCreated={({ gl }) => {
         gl.shadowMap.enabled = true;
         gl.shadowMap.type = THREE.PCFSoftShadowMap;
       }}
-      style={{ position: 'fixed', inset: 0, background: '#000000' }}
+      style={{ position: 'fixed', inset: 0, background: '#080410' }}
     >
-      <fogExp2 attach="fog" args={['#05040a', 0.032]} />
-      <Environment files="/textures/night.hdr" environmentIntensity={0.65} />
+      <fogExp2 attach="fog" args={['#160a28', 0.026]} />
+      <Environment files="/textures/night.hdr" environmentIntensity={0.35} />
       <SceneBridge
         {...props}
         isRenderMode={isRenderMode}
