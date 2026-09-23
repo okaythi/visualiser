@@ -46,9 +46,9 @@ export function useFloorLyrics(
   const lastWordKeyRef   = useRef('');
   const lastStampMs      = useRef(0);
   const ghostsRef        = useRef<Array<{ q: FloorQuadrant; o: number }>>([]);
-  const lastCommittedRef = useRef<{ word: string; quadId: string; opacity: number; hasGhosts: boolean }>({
+  const lastCommittedRef = useRef<{ word: string; quadId: number; opacity: number; hasGhosts: boolean }>({
     word: '',
-    quadId: '',
+    quadId: -1,
     opacity: 0,
     hasGhosts: false,
   });
