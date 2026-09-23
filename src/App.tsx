@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { ThemeToggle } from './components/ThemeToggle';
+import { NixlabsAccountWidget } from './components/NixlabsAccountWidget';
 import { VisualisrCanvas } from './components/VisualisrCanvas';
 import type { TelemetryManifest, Verse } from './types/visualiser';
 
@@ -119,6 +120,7 @@ export const App: React.FC = () => {
             <span style={{ color: '#444' }}>.nixlabs.tech</span>
           </div>
 
+          <NixlabsAccountWidget />
           <ThemeToggle />
         </>
       )}

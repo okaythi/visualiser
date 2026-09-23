@@ -347,3 +347,306 @@ body {
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
 }
+
+.nixlabs-account-card {
+  position: absolute;
+  top: 3.25rem;
+  right: 0;
+  width: 320px;
+  max-width: calc(100vw - 2.5rem);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: nixlabs-card-fade-in 0.15s ease-out;
+}
+
+@keyframes nixlabs-card-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.nixlabs-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nixlabs-header-avatar {
+  position: relative;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.nixlabs-header-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nixlabs-header-fallback {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.nixlabs-header-details {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 0.1rem;
+}
+
+.nixlabs-header-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nixlabs-user-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.nixlabs-role-badge {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background-color: var(--code-bg);
+  border: 1px solid var(--border);
+  color: var(--border-focus);
+  letter-spacing: 0.05em;
+}
+
+.nixlabs-user-email {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nixlabs-card-divider {
+  height: 1px;
+  background-color: var(--border);
+  margin: 0 -1rem;
+}
+
+.nixlabs-menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.nixlabs-section-label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+}
+
+.nixlabs-apps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.nixlabs-app-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.nixlabs-app-item:hover {
+  background-color: var(--bg-subtle);
+  border-color: var(--border);
+}
+
+.nixlabs-app-item.current {
+  background-color: var(--bg-subtle);
+  border-color: var(--border);
+}
+
+.nixlabs-app-indicator {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.nixlabs-app-item.current .nixlabs-app-indicator {
+  color: var(--border-focus);
+}
+
+.nixlabs-app-meta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.nixlabs-app-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.nixlabs-current-tag {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--border-focus);
+}
+
+.nixlabs-app-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.nixlabs-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.5rem;
+}
+
+.nixlabs-action-label {
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.nixlabs-theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.75rem;
+  font-family: var(--mono);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.12s ease;
+}
+
+.nixlabs-theme-toggle-btn:hover {
+  border-color: var(--border-focus);
+}
+
+.nixlabs-theme-icon {
+  font-size: 0.85rem;
+}
+
+.nixlabs-action-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.12s ease;
+}
+
+.nixlabs-action-link:hover {
+  background-color: var(--bg-subtle);
+}
+
+.nixlabs-link-arrow {
+  font-family: var(--mono);
+  color: var(--text-muted);
+}
+
+.nixlabs-card-footer {
+  margin-top: 0.2rem;
+}
+
+.nixlabs-signout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--danger);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.nixlabs-signout-btn:hover {
+  border-color: var(--danger);
+}
+
+.nixlabs-signout-icon {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+}
+
+.nixlabs-avatar-guest {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--text-muted);
+}
+
+.nixlabs-signin-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.65rem;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-focus);
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.12s ease;
+  box-sizing: border-box;
+}
+
+.nixlabs-signin-btn:hover {
+  background-color: var(--border-focus);
+  color: var(--bg);
+}
