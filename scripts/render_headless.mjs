@@ -177,8 +177,8 @@ async function main() {
       '--disable-dev-shm-usage',
       '--disable-features=Translate',
       '--no-first-run',
-      '--no-default-browser-check',
-      `--window-size=${width},${height}`,
+      '--window-size=' + width + ',' + height,
+      '--force-gpu-mem-available-mb=4096',
       '--hide-scrollbars',
       '--mute-audio',
       '--enable-automation',
@@ -294,29 +294,17 @@ async function main() {
   let renderStartTime = startTime;
 
   for (let frame = opts.start; frame < opts.frames; frame++) {
-    // 1. Advance virtual clock & grab WebGL canvas buffer directly (bypasses CDP screenshot pipeline)
-    const qualityNorm = opts.quality / 100;
-    const base64Url = await page.evaluate((f, q) => {
-      return typeof window.__SEEK_FRAME__ === 'function'
-        ? window.__SEEK_FRAME__(f, q)
-        : null;
-    }, frame, qualityNorm);
+    // 1. Advance virtual clock to exact frame timestamp
+    await page.evaluate((f) => window.__SEEK_FRAME__(f), frame);
 
-    let frameBuffer;
-    if (base64Url && typeof base64Url === 'string' && base64Url.startsWith('data:image/jpeg;base64,')) {
-      frameBuffer = Buffer.from(base64Url.slice(23), 'base64');
-    } else {
-      const screenshotOpts = {
-        type: opts.imageType,
-        omitBackground: false,
-      };
-      if (opts.imageType === 'jpeg') {
-        screenshotOpts.quality = opts.quality;
-      }
-      frameBuffer = await page.screenshot(screenshotOpts);
-    }
+    // 2. Native headless compositor capture (zero VRAM memory leaks, immediate surface reclamation)
+    const frameBuffer = await page.screenshot({
+      type: opts.imageType,
+      quality: opts.imageType === 'jpeg' ? opts.quality : undefined,
+      omitBackground: false,
+    });
 
-    // 2. Pipe raw frame to FFmpeg with backpressure handling
+    // 3. Pipe raw frame to FFmpeg with backpressure handling
     const canWrite = ffmpeg.stdin.write(frameBuffer);
     if (!canWrite) {
       await new Promise((resolve) => ffmpeg.stdin.once('drain', resolve));

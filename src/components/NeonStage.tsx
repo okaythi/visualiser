@@ -134,12 +134,12 @@ function StageAnimator({
       z1LightRef.current.intensity = THREE.MathUtils.lerp(z1LightRef.current.intensity, t, Math.min(delta * 12, 1));
     }
     if (z2LightRef.current) {
-      const t = 1.8 + z2.rms * 4.5 + z2.transient * 3.0;
-      z2LightRef.current.intensity = THREE.MathUtils.lerp(z2LightRef.current.intensity, t, Math.min(delta * 10, 1));
+      const t = 2.4 + z2.rms * 6.5 + z2.transient * 3.5;
+      z2LightRef.current.intensity = THREE.MathUtils.lerp(z2LightRef.current.intensity, t, Math.min(delta * 14, 1));
     }
     if (z3LightRef.current) {
-      const t = 1.8 + z3.rms * 4.5 + z3.transient * 3.0;
-      z3LightRef.current.intensity = THREE.MathUtils.lerp(z3LightRef.current.intensity, t, Math.min(delta * 10, 1));
+      const t = 2.4 + z3.rms * 6.5 + z3.transient * 3.5;
+      z3LightRef.current.intensity = THREE.MathUtils.lerp(z3LightRef.current.intensity, t, Math.min(delta * 14, 1));
     }
     if (z4LightRef.current) {
       const t = 1.4 + z4.rms * 4.0 + z4.transient * 3.5;
@@ -343,99 +343,17 @@ function StageModel(props: NeonStageProps) {
         }
 
         case 'Cylinder067': {
-          // Volcanic obsidian glass: ultra-slick (roughness 0.08), pitch black body (#08080c)
-          const monolithMat = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0x08080c),
-            roughness: 0.08,
+          // Cyberpunk 2077 / GTA 6 Photorealistic Volcanic Obsidian Glass:
+          // Ultra-slick glossy black crystal with mirror clearcoat reflecting ray-traced shadows and specular light glints
+          const monolithMat = new THREE.MeshPhysicalMaterial({
+            color: new THREE.Color(0x050508),
+            roughness: 0.10,
             metalness: 0.15,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.05,
+            reflectivity: 0.95,
+            envMapIntensity: 1.6,
           });
-
-          // Inject 7-zone spatial audio energy veining strictly along crystalline fractures
-          monolithMat.onBeforeCompile = (shader) => {
-            shader.uniforms.uTime    = uniformsRef.current.uTime;
-            shader.uniforms.uZ2Rms   = uniformsRef.current.uZ2Rms;
-            shader.uniforms.uZ2Trans = uniformsRef.current.uZ2Trans;
-            shader.uniforms.uZ3Rms   = uniformsRef.current.uZ3Rms;
-            shader.uniforms.uZ3Trans = uniformsRef.current.uZ3Trans;
-            shader.uniforms.uZ4Rms   = uniformsRef.current.uZ4Rms;
-            shader.uniforms.uZ4Trans = uniformsRef.current.uZ4Trans;
-            shader.uniforms.uZ5Rms   = uniformsRef.current.uZ5Rms;
-            shader.uniforms.uZ5Trans = uniformsRef.current.uZ5Trans;
-            shader.uniforms.uZ7Rms   = uniformsRef.current.uZ7Rms;
-
-            shader.vertexShader = `
-              varying vec3 vMonolithWorldPos;
-              ${shader.vertexShader}
-            `;
-            shader.vertexShader = shader.vertexShader.replace(
-              '#include <begin_vertex>',
-              `
-              #include <begin_vertex>
-              vMonolithWorldPos = (modelMatrix * vec4(transformed, 1.0)).xyz;
-              `
-            );
-
-            shader.fragmentShader = `
-              uniform float uTime;
-              uniform float uZ2Rms;
-              uniform float uZ2Trans;
-              uniform float uZ3Rms;
-              uniform float uZ3Trans;
-              uniform float uZ4Rms;
-              uniform float uZ4Trans;
-              uniform float uZ5Rms;
-              uniform float uZ5Trans;
-              uniform float uZ7Rms;
-              varying vec3 vMonolithWorldPos;
-              ${shader.fragmentShader}
-            `;
-
-            shader.fragmentShader = shader.fragmentShader.replace(
-              '#include <emissivemap_fragment>',
-              `
-              #include <emissivemap_fragment>
-              float wx = vMonolithWorldPos.x;
-              float wy = vMonolithWorldPos.y;
-              float wz = vMonolithWorldPos.z;
-
-              bool isLeft = wx < 0.8;
-              bool isFar  = wz < -2.0;
-
-              // High-frequency procedural cleavage vein mask (95%+ of rock remains deep obsidian black)
-              float n1 = sin(wx * 3.5 + wy * 5.0) * cos(wz * 3.5 - wy * 4.0);
-              float veinMask = smoothstep(0.92, 0.99, sin(n1 * 10.0 + wy * 2.0));
-
-              vec3 zoneGlowColor = vec3(0.0);
-
-              if (wy > 2.8 && uZ7Rms > 0.05) {
-                // Zone 7: Cavern Vault / Zenith (Strings, Choir)
-                float vaultFactor = clamp((wy - 2.8) / 3.0, 0.0, 1.0);
-                zoneGlowColor += vec3(0.65, 0.25, 0.95) * (uZ7Rms * 2.5 * vaultFactor);
-              }
-
-              if (isLeft && isFar) {
-                // Zone 2: Deep Left Monoliths (GTR1, Left Synths, BGV1)
-                float energy = uZ2Rms * 2.6 + uZ2Trans * 2.0;
-                zoneGlowColor += vec3(0.58, 0.15, 0.95) * energy;
-              } else if (!isLeft && isFar) {
-                // Zone 3: Deep Right Monoliths (GTR2, Right Synths, BGV2)
-                float energy = uZ3Rms * 2.6 + uZ3Trans * 2.0;
-                zoneGlowColor += vec3(0.00, 0.82, 1.00) * energy;
-              } else if (isLeft && !isFar) {
-                // Zone 4: Near Left Pillars (Claps, Fills, FX)
-                float energy = uZ4Rms * 2.4 + uZ4Trans * 2.5;
-                zoneGlowColor += vec3(0.75, 0.35, 1.00) * energy;
-              } else if (!isLeft && !isFar) {
-                // Zone 5: Near Right Pillars (Hats, Vocoder, Vox FX)
-                float energy = uZ5Rms * 2.4 + uZ5Trans * 2.5;
-                zoneGlowColor += vec3(0.20, 0.75, 1.00) * energy;
-              }
-
-              // Pure subsurface veining: 0 on rock face, light strictly through crystalline fractures
-              totalEmissiveRadiance += zoneGlowColor * veinMask * 2.8;
-              `
-            );
-          };
 
           obj.material = monolithMat;
           obj.castShadow = true;
@@ -557,20 +475,20 @@ function StageModel(props: NeonStageProps) {
       {/* Zone 2: Deep Left Monoliths (GTR1, SYN1, SYN3, BGV1) */}
       <pointLight
         ref={z2LightRef}
-        position={[-3.2, 3.2, -4.5]}
-        color="#7c3aed"
-        intensity={2.0}
-        distance={24}
+        position={[-2.2, 2.8, -3.0]}
+        color="#a855f7"
+        intensity={2.8}
+        distance={30}
         decay={2}
       />
 
       {/* Zone 3: Deep Right Monoliths (GTR2, SYN2, SYN4, BGV2) */}
       <pointLight
         ref={z3LightRef}
-        position={[4.8, 3.2, -4.5]}
-        color="#0284c7"
-        intensity={2.0}
-        distance={24}
+        position={[2.6, 2.8, -3.0]}
+        color="#06b6d4"
+        intensity={3.2}
+        distance={30}
         decay={2}
       />
 

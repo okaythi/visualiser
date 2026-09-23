@@ -108,7 +108,7 @@ export const SceneBridge: React.FC<SceneBridgeProps> = ({
     const syn1 = read('SYN1 STEM');
     const syn3 = read('SYN3 STEM');
     const bgv1 = read('BGV1 STEM');
-    const z2Rms = (gtr1.rms * 1.3 + syn1.rms + syn3.rms + bgv1.rms) / 3.0;
+    const z2Rms = Math.max(gtr1.rms, syn1.rms, syn3.rms) * 1.35 + bgv1.rms * 0.9;
     const z2Trans = Math.max(gtr1.transient, syn1.transient, bgv1.transient);
 
     // ── Zone 3: Right Far Monoliths (GTR2, SYN2, SYN4, BGV2) ───────────────
@@ -116,8 +116,8 @@ export const SceneBridge: React.FC<SceneBridgeProps> = ({
     const syn2 = read('SYN2 STEM');
     const syn4 = read('SYN4 STEM');
     const bgv2 = read('BGV2 STEM');
-    const z3Rms = (gtr2.rms * 1.3 + syn2.rms + syn4.rms + bgv2.rms) / 3.0;
-    const z3Trans = Math.max(gtr2.transient, syn2.transient, bgv2.transient);
+    const z3Rms = Math.max(syn2.rms, bgv2.rms, syn4.rms) * 1.35 + gtr2.rms * 0.9;
+    const z3Trans = Math.max(syn2.transient, bgv2.transient, gtr2.transient);
 
     // ── Zone 4: Left Near Pillars (CLAPS, FILLS, BGV3, FX) ─────────────────
     const claps = read('CLAPS STEM');

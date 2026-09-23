@@ -20,16 +20,15 @@ function DeterministicBridge({
   isRenderMode: boolean;
   virtualTimeRef: React.MutableRefObject<number>;
 }) {
-  const { advance, gl } = useThree();
+  const { advance } = useThree();
 
   useEffect(() => {
     if (!isRenderMode) return;
 
-    (window as any).__SEEK_FRAME__ = (frameIndex: number, quality = 0.92) => {
+    (window as any).__SEEK_FRAME__ = (frameIndex: number) => {
       const t = frameIndex / 60.0;
       virtualTimeRef.current = t;
       advance(t);
-      return gl.domElement.toDataURL('image/jpeg', quality);
     };
 
     (window as any).__IS_READY_FOR_CAPTURE__ = () => {
@@ -43,7 +42,7 @@ function DeterministicBridge({
       delete (window as any).__SEEK_FRAME__;
       delete (window as any).__IS_READY_FOR_CAPTURE__;
     };
-  }, [isRenderMode, advance, gl, virtualTimeRef]);
+  }, [isRenderMode, advance, virtualTimeRef]);
 
   return null;
 }
@@ -63,7 +62,6 @@ export const VisualisrCanvas: React.FC<VisualisrSceneProps> = (props) => {
       frameloop={isRenderMode ? 'never' : 'always'}
       gl={{
         antialias: true,
-        preserveDrawingBuffer: isRenderMode,
         toneMapping: THREE.AgXToneMapping,
         toneMappingExposure: 1.2,
         powerPreference: 'high-performance',
