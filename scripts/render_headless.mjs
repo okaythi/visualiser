@@ -511,6 +511,25 @@ async function main() {
       console.log(`  ✓ 1080p60 Master: ${out1080} (${mb} MB)`);
     }
   }
+
+  // Automatic Google Drive persistence: save immediately before session can disconnect
+  const driveDir = '/content/drive/MyDrive';
+  if (fs.existsSync(driveDir)) {
+    console.log('\n================================================================');
+    console.log('  AUTOMATIC GOOGLE DRIVE SYNC');
+    console.log('================================================================');
+    if (fs.existsSync(out1440)) {
+      const dest1440 = path.join(driveDir, 'Abracadabra_Stage_1440p60.mp4');
+      fs.copyFileSync(out1440, dest1440);
+      console.log(`  ✓ Successfully saved 1440p60 to Google Drive: ${dest1440}`);
+    }
+    if (fs.existsSync(out1080)) {
+      const dest1080 = path.join(driveDir, 'Abracadabra_Stage_1080p60.mp4');
+      fs.copyFileSync(out1080, dest1080);
+      console.log(`  ✓ Successfully saved 1080p60 to Google Drive: ${dest1080}`);
+    }
+    console.log('================================================================\n');
+  }
 }
 
 main().catch((err) => {
