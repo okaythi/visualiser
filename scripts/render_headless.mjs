@@ -87,7 +87,7 @@ function parseArgs() {
     audio: 'public/audio/abracadabra-mix.mp3',
     outDir: '.',
     imageType: 'jpeg',   // 'jpeg' (15x faster) or 'png'
-    quality: 95,         // JPEG quality (visually lossless for video)
+    quality: 98,         // JPEG quality (98 = visually lossless, reference grade)
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -109,11 +109,16 @@ function parseArgs() {
   return options;
 }
 
-// Check if NVENC hardware encoder is available in ffmpeg
+// Check if NVENC hardware encoder is actually available and functional on this GPU
 function checkNvencAvailable() {
   try {
-    const output = execSync('ffmpeg -encoders', { stdio: ['ignore', 'pipe', 'ignore'] }).toString();
-    return output.includes('h264_nvenc');
+    // Perform a quick test encode using h264_nvenc to verify real hardware support
+    // (Note: NVIDIA A100/H100 HPC GPUs lack NVENC hardware silicon and will fail this test)
+    execSync('ffmpeg -y -f lavfi -i color=c=black:s=64x64:d=0.05 -c:v h264_nvenc -f null -', {
+      stdio: ['ignore', 'ignore', 'ignore'],
+      timeout: 5000,
+    });
+    return true;
   } catch {
     return false;
   }
@@ -127,7 +132,11 @@ async function main() {
 
   const hasNvenc = opts.nvenc && checkNvencAvailable();
   const vcodec = hasNvenc ? 'h264_nvenc' : 'libx264';
-  console.log(`Video encoder: ${vcodec} (${hasNvenc ? 'Nvidia Hardware Accelerated' : 'Software Fallback'})`);
+  if (hasNvenc) {
+    console.log('Video encoder: h264_nvenc (NVIDIA Hardware NVENC Accelerated)');
+  } else {
+    console.log('Video encoder: libx264 (Multi-threaded CPU encoding; HPC GPU A100 detected or NVENC omitted)');
+  }
 
   if (!fs.existsSync(opts.audio)) {
     console.error(`ERROR: Audio file not found at ${opts.audio}`);
@@ -178,7 +187,9 @@ async function main() {
       '--disable-features=Translate',
       '--no-first-run',
       '--window-size=' + width + ',' + height,
-      '--force-gpu-mem-available-mb=4096',
+      '--force-gpu-mem-available-mb=32768',
+      '--gpu-memory-buffer-compositor-resources',
+      '--max-active-webgl-contexts=32',
       '--hide-scrollbars',
       '--mute-audio',
       '--enable-automation',
@@ -254,13 +265,13 @@ async function main() {
       '-filter_complex', '[0:v]split=2[v1440][v1080_in];[v1080_in]scale=1920:1080:flags=bicubic[v1080]',
       '-map', '[v1440]', '-map', '1:a',
       '-c:v', vcodec,
-      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '35M'] : ['-preset', 'slow', '-crf', '17']),
+      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '35M'] : ['-preset', 'faster', '-threads', '0', '-crf', '17']),
       '-pix_fmt', 'yuv420p',
       '-c:a', 'aac', '-b:a', '320k',
       out1440,
       '-map', '[v1080]', '-map', '1:a',
       '-c:v', vcodec,
-      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '22M'] : ['-preset', 'slow', '-crf', '18']),
+      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '22M'] : ['-preset', 'faster', '-threads', '0', '-crf', '18']),
       '-pix_fmt', 'yuv420p',
       '-c:a', 'aac', '-b:a', '320k',
       out1080
@@ -268,7 +279,7 @@ async function main() {
   } else if (opts.format === '1440p') {
     ffmpegArgs.push(
       '-c:v', vcodec,
-      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '35M'] : ['-preset', 'slow', '-crf', '17']),
+      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '35M'] : ['-preset', 'faster', '-threads', '0', '-crf', '17']),
       '-pix_fmt', 'yuv420p',
       '-c:a', 'aac', '-b:a', '320k',
       out1440
@@ -276,7 +287,7 @@ async function main() {
   } else {
     ffmpegArgs.push(
       '-c:v', vcodec,
-      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '22M'] : ['-preset', 'slow', '-crf', '18']),
+      ...(hasNvenc ? ['-preset', 'p7', '-b:v', '22M'] : ['-preset', 'faster', '-threads', '0', '-crf', '18']),
       '-pix_fmt', 'yuv420p',
       '-c:a', 'aac', '-b:a', '320k',
       out1080

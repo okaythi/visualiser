@@ -413,7 +413,7 @@ function StageModel(props: NeonStageProps) {
         <MeshReflectorMaterial
           ref={reflectorRef}
           blur={[120, 40]}
-          resolution={1024}
+          resolution={2048}
           mixBlur={0.85}
           mixStrength={3.2}
           roughness={0.12}
@@ -441,8 +441,8 @@ function StageModel(props: NeonStageProps) {
         intensity={0.85}
         color="#c084fc"
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        shadow-mapSize-width={4096}
+        shadow-mapSize-height={4096}
         shadow-bias={-0.0001}
       />
 
@@ -466,8 +466,8 @@ function StageModel(props: NeonStageProps) {
         distance={35}
         decay={2}
         castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
         shadow-radius={3.5}
         shadow-bias={-0.0001}
       />
