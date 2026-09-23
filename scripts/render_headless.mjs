@@ -272,8 +272,6 @@ async function main() {
       '--enable-gpu',
       '--use-angle=vulkan',
       '--enable-features=Vulkan',
-      '--disable-vulkan-surface',
-      '--enable-unsafe-webgpu',
       '--ignore-gpu-blocklist',
       '--enable-webgl',
       '--enable-gpu-rasterization',
